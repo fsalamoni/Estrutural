@@ -42,14 +42,16 @@ export function ToastContainer() {
         <div
           key={t.id}
           role="status"
-          className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium
-                      shadow-lg backdrop-blur-sm animate-slide-up whitespace-nowrap
+          className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-label
+                      shadow-lg backdrop-blur-sm animate-slide-up whitespace-nowrap uppercase tracking-wider
             ${t.type === 'success'
-              ? 'border-green-800 bg-green-900/80 text-green-300'
-              : 'border-red-800 bg-red-900/80 text-red-300'
+              ? 'border-tertiary/30 bg-surface-container text-tertiary shadow-[0_0_12px_rgba(233,195,73,0.15)]'
+              : 'border-error-container bg-error-container/20 text-error'
             }`}
         >
-          <span aria-hidden="true">{t.type === 'success' ? '✓' : '✕'}</span>
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+            {t.type === 'success' ? 'check_circle' : 'error'}
+          </span>
           {t.message}
         </div>
       ))}

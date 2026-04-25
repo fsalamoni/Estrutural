@@ -73,7 +73,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="bg-[#0A0A0C] w-full py-12 border-t border-purple-900/30 flex flex-col items-center gap-4">
-        <p className="font-label text-xs uppercase tracking-widest text-gray-600">
+        <p className="font-label text-xs uppercase tracking-widest text-on-primary-container">
           © {new Date().getFullYear()} PROTAGONISTA RPG. TODOS OS DIREITOS RESERVADOS.
         </p>
       </footer>
