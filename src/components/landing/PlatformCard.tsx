@@ -25,7 +25,7 @@ export default function PlatformCard({ platform }: Props) {
           {platform.iconUrl ? (
             <Image
               src={platform.iconUrl}
-              alt={`Ícone ${platform.name}`}
+              alt={`Logo de ${platform.name}`}
               fill
               className="object-contain p-2"
               unoptimized

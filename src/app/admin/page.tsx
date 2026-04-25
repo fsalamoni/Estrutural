@@ -8,7 +8,7 @@ import PlatformForm from '@/components/admin/PlatformForm';
 
 export default function AdminPage() {
   const { user, signOut } = useAuth();
-  const { platforms, loading } = useAllPlatforms();
+  const { platforms, loading, error } = useAllPlatforms();
   const [showForm, setShowForm] = useState(false);
 
   async function handleSignOut() {
@@ -108,7 +108,12 @@ export default function AdminPage() {
         </div>
 
         {/* Tabela */}
-        {loading ? (
+        {error ? (
+          <div className="flex h-48 flex-col items-center justify-center gap-3 rounded-2xl border border-red-800/50 bg-red-900/10">
+            <p className="text-sm text-red-400">Erro ao carregar plataformas: {error}</p>
+            <p className="text-xs text-gray-600">Verifique as regras do Firestore e tente recarregar a página.</p>
+          </div>
+        ) : loading ? (
           <div className="flex h-48 items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-dark-border border-t-accent-purple" />
           </div>

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef, FormEvent } from 'react';
+import { useState, useRef, FormEvent, useEffect } from 'react';
 import Image from 'next/image';
 import { Platform, PlatformInput } from '@/lib/types';
 import { createPlatform, updatePlatform } from '@/lib/firebase/firestore';
-import { uploadPlatformIcon } from '@/lib/firebase/storage';
+import { uploadPlatformIcon, deletePlatformIcon, isFirebaseStorageUrl } from '@/lib/firebase/storage';
 import { toast } from '@/components/ui/Toast';
 
 interface Props {
@@ -44,6 +44,15 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Fechar modal com tecla ESC
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && !saving) onClose();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [saving, onClose]);
+
   function handleIconChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -61,6 +70,13 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
 
       if (isEditing) {
         if (iconFile) {
+          // If the old icon was in Storage and the file name/ext changed, delete it first
+          const oldUrl = platform!.iconUrl;
+          if (oldUrl && isFirebaseStorageUrl(oldUrl)) {
+            const oldExt = oldUrl.split('.').pop()?.split('?')[0];
+            const newExt = iconFile.name.split('.').pop()?.toLowerCase();
+            if (oldExt !== newExt) await deletePlatformIcon(oldUrl);
+          }
           iconUrl = await uploadPlatformIcon(iconFile, platform!.id);
         }
         await updatePlatform(platform!.id, { ...form, iconUrl });
@@ -86,12 +102,20 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-dark-border bg-dark-card
-                      shadow-2xl shadow-black/50 animate-slide-up overflow-y-auto max-h-[90vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget && !saving) onClose(); }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="form-title"
+        className="w-full max-w-lg rounded-2xl border border-dark-border bg-dark-card
+                      shadow-2xl shadow-black/50 animate-slide-up overflow-y-auto max-h-[90vh]"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-dark-border p-6">
-          <h2 className="text-xl font-semibold text-white">
+          <h2 id="form-title" className="text-xl font-semibold text-white">
             {isEditing ? 'Editar Plataforma' : 'Nova Plataforma'}
           </h2>
           <button

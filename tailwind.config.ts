@@ -2,7 +2,6 @@ import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
@@ -31,7 +30,6 @@ const config: Config = {
       animation: {
         'fade-in': 'fadeIn 0.4s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
-        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -41,10 +39,6 @@ const config: Config = {
         slideUp: {
           '0%': { transform: 'translateY(10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 5px rgba(124, 58, 237, 0.3)' },
-          '50%': { boxShadow: '0 0 20px rgba(124, 58, 237, 0.6)' },
         },
       },
     },

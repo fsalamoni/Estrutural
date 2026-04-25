@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Platform, AUTH_METHOD_LABELS } from '@/lib/types';
-import { deletePlatform, toggleVisibility } from '@/lib/firebase/firestore';
+import { deletePlatform, toggleVisibility, updateOrder } from '@/lib/firebase/firestore';
 import { toast } from '@/components/ui/Toast';
 import PlatformForm from './PlatformForm';
 
@@ -13,13 +13,14 @@ interface Props {
 
 export default function PlatformTable({ platforms }: Props) {
   const [editing, setEditing] = useState<Platform | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Platform | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [movingId, setMovingId] = useState<string | null>(null);
 
-  async function handleDelete(id: string) {
+  async function handleDelete(platform: Platform) {
     setDeleting(true);
     try {
-      await deletePlatform(id);
+      await deletePlatform(platform.id, platform.iconUrl);
       setConfirmDelete(null);
       toast('Plataforma excluída com sucesso');
     } catch {
@@ -38,6 +39,25 @@ export default function PlatformTable({ platforms }: Props) {
     }
   }
 
+  async function handleMove(index: number, direction: 'up' | 'down') {
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= platforms.length) return;
+
+    const current = platforms[index];
+    const swapWith = platforms[swapIndex];
+    setMovingId(current.id);
+    try {
+      await Promise.all([
+        updateOrder(current.id, swapWith.order),
+        updateOrder(swapWith.id, current.order),
+      ]);
+    } catch {
+      toast('Erro ao reordenar plataforma.', 'error');
+    } finally {
+      setMovingId(null);
+    }
+  }
+
   return (
     <>
       {editing && (
@@ -49,11 +69,18 @@ export default function PlatformTable({ platforms }: Props) {
       )}
 
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="dialog-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+        >
           <div className="w-full max-w-sm rounded-2xl border border-red-800 bg-dark-card p-6 animate-slide-up">
-            <h3 className="mb-2 text-lg font-semibold text-white">Excluir plataforma?</h3>
+            <h3 id="dialog-title" className="mb-2 text-lg font-semibold text-white">
+              Excluir &ldquo;{confirmDelete.name}&rdquo;?
+            </h3>
             <p className="mb-6 text-sm text-gray-400">
-              Esta ação não pode ser desfeita. A plataforma será removida permanentemente.
+              Esta ação não pode ser desfeita. A plataforma e seu ícone serão removidos permanentemente.
             </p>
             <div className="flex gap-3">
               <button
@@ -81,12 +108,13 @@ export default function PlatformTable({ platforms }: Props) {
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="mb-3 text-4xl">📭</div>
             <p className="text-gray-400">Nenhuma plataforma cadastrada ainda.</p>
-            <p className="text-sm text-gray-600 mt-1">Clique em "Nova Plataforma" para começar.</p>
+            <p className="text-sm text-gray-600 mt-1">Clique em &ldquo;Nova Plataforma&rdquo; para começar.</p>
           </div>
         ) : (
           <table className="w-full">
             <thead>
               <tr className="border-b border-dark-border bg-dark-bg">
+                <th className="w-8 px-2 py-3" />
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Plataforma
                 </th>
@@ -102,17 +130,43 @@ export default function PlatformTable({ platforms }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-dark-border">
-              {platforms.map((p) => (
+              {platforms.map((p, index) => (
                 <tr
                   key={p.id}
                   className={`transition-colors hover:bg-dark-hover ${!p.visible ? 'opacity-50' : ''}`}
                 >
+                  {/* Reorder controls */}
+                  <td className="px-2 py-4">
+                    <div className="flex flex-col gap-0.5">
+                      <button
+                        onClick={() => handleMove(index, 'up')}
+                        disabled={index === 0 || movingId === p.id}
+                        aria-label={`Mover ${p.name} para cima`}
+                        className="flex h-5 w-5 items-center justify-center rounded text-gray-600
+                                   hover:bg-dark-border hover:text-gray-300 disabled:opacity-20
+                                   disabled:cursor-not-allowed transition-all text-xs"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        onClick={() => handleMove(index, 'down')}
+                        disabled={index === platforms.length - 1 || movingId === p.id}
+                        aria-label={`Mover ${p.name} para baixo`}
+                        className="flex h-5 w-5 items-center justify-center rounded text-gray-600
+                                   hover:bg-dark-border hover:text-gray-300 disabled:opacity-20
+                                   disabled:cursor-not-allowed transition-all text-xs"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                  </td>
+
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg
                                       border border-dark-border bg-dark-bg">
                         {p.iconUrl ? (
-                          <Image src={p.iconUrl} alt="" fill className="object-contain p-1" unoptimized />
+                          <Image src={p.iconUrl} alt={`Logo de ${p.name}`} fill className="object-contain p-1" unoptimized />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-sm
                                           font-bold text-accent-glow">
@@ -159,7 +213,7 @@ export default function PlatformTable({ platforms }: Props) {
                         Editar
                       </button>
                       <button
-                        onClick={() => setConfirmDelete(p.id)}
+                        onClick={() => setConfirmDelete(p)}
                         className="rounded-lg border border-red-900/50 px-3 py-1.5 text-xs
                                    text-red-400 hover:bg-red-900/20 hover:border-red-700
                                    transition-all"

@@ -3,11 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 const SESSION_COOKIE = '__session';
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 dias
 
+// Firebase UIDs são 28 caracteres alfanuméricos
+const FIREBASE_UID_RE = /^[a-zA-Z0-9]{20,128}$/;
+
 // POST /api/auth/session — define o cookie de sessão com HttpOnly
 export async function POST(request: NextRequest) {
-  const { uid } = await request.json();
+  const body = await request.json().catch(() => ({}));
+  const { uid } = body;
 
-  if (!uid || typeof uid !== 'string') {
+  if (!uid || typeof uid !== 'string' || !FIREBASE_UID_RE.test(uid)) {
     return NextResponse.json({ error: 'UID inválido' }, { status: 400 });
   }
 

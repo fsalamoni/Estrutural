@@ -1,0 +1,19 @@
+[
+  {
+    "origin": [
+      "https://protagonistarpg.com.br",
+      "https://www.protagonistarpg.com.br",
+      "http://localhost:3000",
+      "http://localhost:8788"
+    ],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": [
+      "Content-Type",
+      "Content-Disposition",
+      "Content-Length",
+      "Authorization",
+      "x-goog-resumable"
+    ]
+  }
+]

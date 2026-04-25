@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0f1a"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Glow blobs -->
+  <circle cx="200" cy="150" r="250" fill="#7c3aed" opacity="0.08" filter="url(#glow)"/>
+  <circle cx="1000" cy="480" r="250" fill="#2563eb" opacity="0.08" filter="url(#glow)"/>
+
+  <!-- Border -->
+  <rect x="40" y="40" width="1120" height="550" rx="20" fill="none" stroke="#2a2a4a" stroke-width="2"/>
+
+  <!-- Logo mark -->
+  <rect x="80" y="80" width="72" height="72" rx="16" fill="url(#accent)"/>
+  <text x="116" y="133" font-family="system-ui,sans-serif" font-size="42" font-weight="700"
+        text-anchor="middle" fill="white">P</text>
+
+  <!-- Title -->
+  <text x="80" y="280" font-family="system-ui,sans-serif" font-size="72" font-weight="700" fill="white">
+    Protagonista RPG
+  </text>
+
+  <!-- Subtitle gradient -->
+  <text x="80" y="360" font-family="system-ui,sans-serif" font-size="40" font-weight="500" fill="url(#accent)">
+    Hub de Plataformas
+  </text>
+
+  <!-- Description -->
+  <text x="80" y="430" font-family="system-ui,sans-serif" font-size="28" fill="#6b7280">
+    Acesse todas as suas plataformas em um único lugar.
+  </text>
+
+  <!-- URL -->
+  <text x="80" y="540" font-family="system-ui,sans-serif" font-size="22" fill="#4b5563">
+    protagonistarpg.com.br
+  </text>
+</svg>

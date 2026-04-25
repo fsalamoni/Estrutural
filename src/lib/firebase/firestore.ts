@@ -13,6 +13,7 @@ import {
   DocumentData,
 } from 'firebase/firestore';
 import { db } from './config';
+import { deletePlatformIcon } from './storage';
 import { Platform, PlatformInput } from '../types';
 
 const COLLECTION = 'platforms';
@@ -73,8 +74,9 @@ export async function updatePlatform(
   });
 }
 
-export async function deletePlatform(id: string): Promise<void> {
+export async function deletePlatform(id: string, iconUrl?: string): Promise<void> {
   await deleteDoc(doc(db, COLLECTION, id));
+  if (iconUrl) await deletePlatformIcon(iconUrl);
 }
 
 export async function toggleVisibility(id: string, visible: boolean): Promise<void> {
