@@ -9,9 +9,15 @@ export default function PlatformGrid() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="mb-4 text-5xl">⚠️</div>
-        <p className="text-lg font-medium text-gray-400">Não foi possível carregar as plataformas.</p>
-        <p className="mt-1 text-sm text-gray-600">Verifique sua conexão e recarregue a página.</p>
+        <span className="material-symbols-outlined text-5xl text-on-primary-container mb-4">
+          warning
+        </span>
+        <p className="font-display text-lg font-semibold text-on-surface-variant">
+          Não foi possível carregar as plataformas.
+        </p>
+        <p className="font-sans text-sm text-on-primary-container mt-1">
+          Verifique sua conexão e recarregue a página.
+        </p>
       </div>
     );
   }
@@ -22,7 +28,7 @@ export default function PlatformGrid() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="h-44 rounded-2xl border border-dark-border bg-dark-card animate-pulse"
+            className="h-56 rounded-xl border border-outline-variant bg-surface-container animate-pulse"
           />
         ))}
       </div>
@@ -32,9 +38,15 @@ export default function PlatformGrid() {
   if (platforms.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="mb-4 text-5xl">🚀</div>
-        <p className="text-lg font-medium text-gray-400">Plataformas em breve...</p>
-        <p className="mt-1 text-sm text-gray-600">As plataformas serão exibidas aqui.</p>
+        <span className="material-symbols-outlined text-5xl text-secondary mb-4">
+          rocket_launch
+        </span>
+        <p className="font-display text-lg font-semibold text-on-surface-variant">
+          Plataformas em breve...
+        </p>
+        <p className="font-sans text-sm text-on-primary-container mt-1">
+          As plataformas serão exibidas aqui quando configuradas.
+        </p>
       </div>
     );
   }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Platform, AUTH_METHOD_LABELS } from '@/lib/types';
+import { Platform, AUTH_METHOD_LABELS, AUTH_METHOD_COLORS } from '@/lib/types';
 import { deletePlatform, toggleVisibility, updateOrder } from '@/lib/firebase/firestore';
 import { toast } from '@/components/ui/Toast';
 import PlatformForm from './PlatformForm';
@@ -33,7 +33,7 @@ export default function PlatformTable({ platforms }: Props) {
   async function handleToggle(id: string, currentVisible: boolean) {
     try {
       await toggleVisibility(id, !currentVisible);
-      toast(!currentVisible ? 'Plataforma exibida na landing page' : 'Plataforma ocultada');
+      toast(!currentVisible ? 'Plataforma exibida no portal' : 'Plataforma ocultada');
     } catch {
       toast('Erro ao alterar visibilidade.', 'error');
     }
@@ -42,7 +42,6 @@ export default function PlatformTable({ platforms }: Props) {
   async function handleMove(index: number, direction: 'up' | 'down') {
     const swapIndex = direction === 'up' ? index - 1 : index + 1;
     if (swapIndex < 0 || swapIndex >= platforms.length) return;
-
     const current = platforms[index];
     const swapWith = platforms[swapIndex];
     setMovingId(current.id);
@@ -68,33 +67,32 @@ export default function PlatformTable({ platforms }: Props) {
         />
       )}
 
+      {/* Confirm delete dialog */}
       {confirmDelete && (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
         >
-          <div className="w-full max-w-sm rounded-2xl border border-red-800 bg-dark-card p-6 animate-slide-up">
-            <h3 id="dialog-title" className="mb-2 text-lg font-semibold text-white">
+          <div className="glass-panel w-full max-w-sm rounded-xl p-6 border border-error-container/30 animate-slide-up">
+            <h3 id="dialog-title" className="font-display text-lg font-bold text-on-surface mb-2">
               Excluir &ldquo;{confirmDelete.name}&rdquo;?
             </h3>
-            <p className="mb-6 text-sm text-gray-400">
+            <p className="font-sans text-sm text-on-surface-variant mb-6">
               Esta ação não pode ser desfeita. A plataforma e seu ícone serão removidos permanentemente.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="flex-1 rounded-xl border border-dark-border py-2 text-sm text-gray-400
-                           hover:text-white transition-colors"
+                className="flex-1 rounded-xl border border-outline-variant py-2.5 text-sm font-display text-on-surface-variant hover:text-on-surface transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
                 disabled={deleting}
-                className="flex-1 rounded-xl bg-red-700 py-2 text-sm font-semibold text-white
-                           hover:bg-red-600 transition-colors disabled:opacity-60"
+                className="flex-1 rounded-xl bg-error-container py-2.5 text-sm font-display font-semibold text-on-error-container hover:brightness-110 transition-all disabled:opacity-60"
               >
                 {deleting ? 'Excluindo...' : 'Excluir'}
               </button>
@@ -103,131 +101,125 @@ export default function PlatformTable({ platforms }: Props) {
         </div>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-dark-border">
-        {platforms.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-3 text-4xl">📭</div>
-            <p className="text-gray-400">Nenhuma plataforma cadastrada ainda.</p>
-            <p className="text-sm text-gray-600 mt-1">Clique em &ldquo;Nova Plataforma&rdquo; para começar.</p>
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-dark-border bg-dark-bg">
-                <th className="w-8 px-2 py-3" />
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Plataforma
-                </th>
-                <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 sm:table-cell">
-                  Acesso
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Visível
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-dark-border">
-              {platforms.map((p, index) => (
-                <tr
-                  key={p.id}
-                  className={`transition-colors hover:bg-dark-hover ${!p.visible ? 'opacity-50' : ''}`}
-                >
-                  {/* Reorder controls */}
-                  <td className="px-2 py-4">
-                    <div className="flex flex-col gap-0.5">
-                      <button
-                        onClick={() => handleMove(index, 'up')}
-                        disabled={index === 0 || movingId === p.id}
-                        aria-label={`Mover ${p.name} para cima`}
-                        className="flex h-5 w-5 items-center justify-center rounded text-gray-600
-                                   hover:bg-dark-border hover:text-gray-300 disabled:opacity-20
-                                   disabled:cursor-not-allowed transition-all text-xs"
-                      >
-                        ▲
-                      </button>
-                      <button
-                        onClick={() => handleMove(index, 'down')}
-                        disabled={index === platforms.length - 1 || movingId === p.id}
-                        aria-label={`Mover ${p.name} para baixo`}
-                        className="flex h-5 w-5 items-center justify-center rounded text-gray-600
-                                   hover:bg-dark-border hover:text-gray-300 disabled:opacity-20
-                                   disabled:cursor-not-allowed transition-all text-xs"
-                      >
-                        ▼
-                      </button>
-                    </div>
-                  </td>
+      {/* Platform cards */}
+      {platforms.length === 0 ? (
+        <div className="glass-panel rounded-xl flex flex-col items-center justify-center py-20 text-center">
+          <span className="material-symbols-outlined text-5xl text-on-primary-container mb-4">
+            inbox
+          </span>
+          <p className="font-display font-semibold text-on-surface-variant">
+            Nenhuma plataforma cadastrada ainda.
+          </p>
+          <p className="font-sans text-sm text-on-primary-container mt-1">
+            Clique em &ldquo;Nova Plataforma&rdquo; para começar.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {platforms.map((p, index) => (
+            <div
+              key={p.id}
+              className={`obsidian-card rounded-xl p-5 flex gap-5 items-center ${!p.visible ? 'opacity-50' : ''}`}
+            >
+              {/* Icon */}
+              <div className="h-20 w-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container flex items-center justify-center border border-outline-variant">
+                {p.iconUrl ? (
+                  <Image
+                    src={p.iconUrl}
+                    alt={`Logo de ${p.name}`}
+                    width={80}
+                    height={80}
+                    className="object-contain p-2"
+                    unoptimized
+                  />
+                ) : (
+                  <span className="font-display text-2xl font-black text-secondary">
+                    {p.name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
 
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg
-                                      border border-dark-border bg-dark-bg">
-                        {p.iconUrl ? (
-                          <Image src={p.iconUrl} alt={`Logo de ${p.name}`} fill className="object-contain p-1" unoptimized />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center text-sm
-                                          font-bold text-accent-glow">
-                            {p.name.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-medium text-white">{p.name}</div>
-                        {p.description && (
-                          <div className="mt-0.5 text-xs text-gray-500 line-clamp-1">
-                            {p.description}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="hidden px-4 py-4 sm:table-cell">
-                    <span className="text-xs text-gray-400">{AUTH_METHOD_LABELS[p.authMethod]}</span>
-                  </td>
-                  <td className="px-4 py-4 text-center">
+              {/* Info + actions */}
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="min-w-0">
+                    <h4 className="font-display font-semibold text-on-surface truncate">{p.name}</h4>
+                    {p.description && (
+                      <p className="text-xs text-on-primary-container mt-0.5 line-clamp-1 font-sans">
+                        {p.description}
+                      </p>
+                    )}
+                  </div>
+                  <span
+                    className={`px-2 py-1 text-[10px] font-label font-bold rounded-lg uppercase border flex-shrink-0 ml-2
+                      ${AUTH_METHOD_COLORS[p.authMethod]}`}
+                  >
+                    {AUTH_METHOD_LABELS[p.authMethod]}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  {/* Reorder */}
+                  <div className="flex flex-col gap-0.5 mr-1">
                     <button
-                      role="switch"
-                      aria-checked={p.visible}
-                      aria-label={`${p.visible ? 'Ocultar' : 'Exibir'} ${p.name}`}
-                      onClick={() => handleToggle(p.id, p.visible)}
-                      className={`relative inline-flex h-5 w-9 rounded-full transition-colors
-                        ${p.visible ? 'bg-accent-purple' : 'bg-gray-700'}`}
+                      onClick={() => handleMove(index, 'up')}
+                      disabled={index === 0 || movingId === p.id}
+                      aria-label={`Mover ${p.name} para cima`}
+                      className="p-1 text-on-primary-container hover:text-on-surface hover:bg-white/5 rounded transition-all disabled:opacity-20 disabled:cursor-not-allowed"
                     >
-                      <span
-                        className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow
-                          transition-transform ${p.visible ? 'translate-x-4' : 'translate-x-0.5'}`}
-                      />
+                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                        keyboard_arrow_up
+                      </span>
                     </button>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => setEditing(p)}
-                        className="rounded-lg border border-dark-border px-3 py-1.5 text-xs
-                                   text-gray-400 hover:border-accent-purple hover:text-white
-                                   transition-all"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => setConfirmDelete(p)}
-                        className="rounded-lg border border-red-900/50 px-3 py-1.5 text-xs
-                                   text-red-400 hover:bg-red-900/20 hover:border-red-700
-                                   transition-all"
-                      >
-                        Excluir
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+                    <button
+                      onClick={() => handleMove(index, 'down')}
+                      disabled={index === platforms.length - 1 || movingId === p.id}
+                      aria-label={`Mover ${p.name} para baixo`}
+                      className="p-1 text-on-primary-container hover:text-on-surface hover:bg-white/5 rounded transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                        keyboard_arrow_down
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Visibility toggle */}
+                  <button
+                    role="switch"
+                    aria-checked={p.visible}
+                    aria-label={`${p.visible ? 'Ocultar' : 'Exibir'} ${p.name}`}
+                    onClick={() => handleToggle(p.id, p.visible)}
+                    className="p-2 text-on-primary-container hover:text-secondary rounded-lg transition-all"
+                    title={p.visible ? 'Ocultar' : 'Exibir'}
+                  >
+                    <span className="material-symbols-outlined text-lg">
+                      {p.visible ? 'visibility' : 'visibility_off'}
+                    </span>
+                  </button>
+
+                  {/* Edit / Delete */}
+                  <div className="ml-auto flex gap-1">
+                    <button
+                      onClick={() => setEditing(p)}
+                      className="p-2 text-on-primary-container hover:text-on-surface hover:bg-white/5 rounded-lg transition-all"
+                      title="Editar"
+                    >
+                      <span className="material-symbols-outlined text-lg">edit</span>
+                    </button>
+                    <button
+                      onClick={() => setConfirmDelete(p)}
+                      className="p-2 text-on-primary-container hover:text-error rounded-lg transition-all"
+                      title="Excluir"
+                    >
+                      <span className="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }

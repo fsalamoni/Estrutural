@@ -23,8 +23,8 @@ export const AUTH_METHOD_LABELS: Record<Platform['authMethod'], string> = {
 };
 
 export const AUTH_METHOD_COLORS: Record<Platform['authMethod'], string> = {
-  email: 'bg-blue-900/50 text-blue-300 border-blue-700',
-  google: 'bg-red-900/50 text-red-300 border-red-700',
-  ambos: 'bg-purple-900/50 text-purple-300 border-purple-700',
-  nenhum: 'bg-gray-800/50 text-gray-400 border-gray-600',
+  email: 'bg-secondary-container/10 text-secondary border-secondary/20',
+  google: 'bg-tertiary/10 text-tertiary border-tertiary/20',
+  ambos: 'bg-secondary-container/20 text-on-secondary-container border-secondary-container/30',
+  nenhum: 'bg-surface-container-high text-on-surface-variant border-outline-variant',
 };

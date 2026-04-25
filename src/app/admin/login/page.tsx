@@ -70,70 +70,96 @@ export default function AdminLoginPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-dark-bg">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-dark-border border-t-accent-purple" />
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-outline-variant border-t-secondary" />
       </div>
     );
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-dark-bg px-4">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-accent-purple/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-accent-blue/10 blur-3xl" />
-      </div>
+    <main className="min-h-screen obsidian-gradient arcane-pattern flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Decorative glows */}
+      <div className="absolute top-1/4 -left-24 w-96 h-96 bg-secondary-container/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-24 w-96 h-96 bg-tertiary/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative w-full max-w-sm">
-        <div className="rounded-2xl border border-dark-border bg-dark-card p-8 shadow-2xl shadow-black/50 animate-slide-up">
-          <div className="mb-8 text-center">
-            <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl
-                            bg-accent-purple/20 text-2xl">
-              🔐
+      {/* Brand header */}
+      <header className="fixed top-0 w-full z-50 flex justify-center items-center h-20">
+        <div className="font-display font-black tracking-[0.2em] text-on-surface opacity-30 text-base uppercase">
+          PROTAGONISTA
+        </div>
+      </header>
+
+      {/* Login card */}
+      <div className="w-full max-w-md z-10">
+        <div className="bg-surface-container/60 backdrop-blur-2xl p-8 border border-white/10 rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-slide-up">
+          {/* Icon + title */}
+          <div className="flex flex-col items-center mb-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-secondary-container to-[#0A0A0C] border border-secondary-container/50 rounded-full flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(87,27,193,0.3)]">
+              <span
+                className="material-symbols-outlined text-secondary text-3xl"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                shield
+              </span>
             </div>
-            <h1 className="text-2xl font-bold text-white">Área Admin</h1>
-            <p className="mt-1 text-sm text-gray-500">Acesso restrito ao administrador</p>
+            <h1 className="font-display text-2xl font-bold text-on-surface tracking-tight mb-2 uppercase">
+              Acesso Archivist
+            </h1>
+            <p className="font-sans text-on-surface-variant text-sm max-w-[280px]">
+              Entre com suas credenciais para gerenciar as plataformas do portal.
+            </p>
           </div>
 
-          <form onSubmit={handleEmailLogin} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-gray-300">
-                E-mail
+          {/* Form */}
+          <form onSubmit={handleEmailLogin} className="space-y-6">
+            <div className="space-y-2">
+              <label className="font-label text-xs text-on-surface-variant uppercase tracking-widest ml-1">
+                Identificador Admin
               </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@exemplo.com"
-                autoComplete="email"
-                className="w-full rounded-xl border border-dark-border bg-dark-bg px-4 py-3
-                           text-white placeholder-gray-600 focus:border-accent-purple
-                           focus:outline-none transition-colors"
-              />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <span className="material-symbols-outlined text-outline group-focus-within:text-secondary transition-colors">
+                    fingerprint
+                  </span>
+                </div>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="email@protagonistarpg.com.br"
+                  autoComplete="email"
+                  className="w-full bg-surface-container-lowest border border-outline-variant focus:border-secondary text-on-surface py-4 pl-12 pr-4 rounded-xl placeholder:text-outline/50 focus:outline-none transition-colors"
+                />
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-gray-300">
-                Senha
+            <div className="space-y-2">
+              <label className="font-label text-xs text-on-surface-variant uppercase tracking-widest ml-1">
+                Vault Passcode
               </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete="current-password"
-                className="w-full rounded-xl border border-dark-border bg-dark-bg px-4 py-3
-                           text-white placeholder-gray-600 focus:border-accent-purple
-                           focus:outline-none transition-colors"
-              />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <span className="material-symbols-outlined text-outline group-focus-within:text-secondary transition-colors">
+                    key
+                  </span>
+                </div>
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  className="w-full bg-surface-container-lowest border border-outline-variant focus:border-secondary text-on-surface py-4 pl-12 pr-4 rounded-xl placeholder:text-outline/50 focus:outline-none transition-colors"
+                />
+              </div>
             </div>
 
             {error && (
-              <p role="alert" className="rounded-xl border border-red-800 bg-red-900/20 px-4 py-2.5
-                            text-sm text-red-400">
+              <p role="alert" className="rounded-xl border border-error-container bg-error-container/20 px-4 py-3 text-sm text-error">
                 {error}
               </p>
             )}
@@ -141,28 +167,26 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-xl bg-accent-purple py-3 text-sm font-semibold
-                         text-white hover:bg-violet-600 transition-colors
-                         disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-secondary-container hover:bg-secondary-container/90 text-on-secondary-container font-display text-sm font-semibold py-4 rounded-xl transition-all flex items-center justify-center gap-3 group disabled:opacity-60 disabled:cursor-not-allowed uppercase tracking-wider"
             >
-              {isLoading ? 'Entrando...' : 'Entrar'}
+              <span>{isLoading ? 'Inicializando...' : 'Inicializar Sessão Segura'}</span>
+              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">terminal</span>
             </button>
           </form>
 
-          <div className="my-5 flex items-center gap-3">
-            <div className="flex-1 border-t border-dark-border" />
-            <span className="text-xs text-gray-600">ou</span>
-            <div className="flex-1 border-t border-dark-border" />
+          {/* Divider */}
+          <div className="flex items-center my-6 gap-4">
+            <div className="h-px bg-white/10 flex-grow" />
+            <span className="font-label text-xs text-outline uppercase tracking-widest">Federação Segura</span>
+            <div className="h-px bg-white/10 flex-grow" />
           </div>
 
+          {/* Google */}
           <button
             onClick={handleGoogleLogin}
             disabled={isLoading}
             aria-label="Entrar com Google"
-            className="flex w-full items-center justify-center gap-3 rounded-xl border
-                       border-dark-border bg-dark-bg py-3 text-sm font-medium text-gray-300
-                       hover:border-white/20 hover:text-white transition-all
-                       disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-surface-container-low hover:bg-surface-container-high border border-white/5 py-4 rounded-xl flex items-center justify-center gap-3 transition-colors text-on-surface disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -170,17 +194,29 @@ export default function AdminLoginPage() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            Entrar com Google
+            <span className="font-sans">Entrar com Google</span>
           </button>
         </div>
 
-        <p className="mt-6 text-center text-xs text-gray-700">
+        {/* Status indicator */}
+        <div className="mt-6 flex justify-between items-center px-2">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-tertiary animate-pulse shadow-[0_0_8px_#e9c349]" />
+            <span className="font-label text-xs text-on-surface-variant">NODE STATUS: ATIVO</span>
+          </div>
+          <span className="font-label text-xs text-outline">LEVEL 4 ENCRYPTION</span>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-on-primary-container">
           ←{' '}
-          <a href="/" className="hover:text-gray-500 transition-colors">
-            Voltar para a landing page
+          <a href="/" className="hover:text-on-surface-variant transition-colors font-label">
+            Voltar para o portal
           </a>
         </p>
       </div>
+
+      {/* Vignette */}
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
     </main>
   );
 }

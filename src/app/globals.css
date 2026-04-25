@@ -3,39 +3,87 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0f0f1a;
-  --card: #1a1a2e;
-}
-
-* {
-  box-sizing: border-box;
+  color-scheme: dark;
 }
 
 body {
-  background-color: var(--bg);
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #121414;
+  color: #e2e2e2;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar escuro */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #0f0f1a;
-}
-::-webkit-scrollbar-thumb {
-  background: #2a2a4a;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #7c3aed;
+/* Material Symbols Outlined — icon font */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+  font-family: 'Material Symbols Outlined';
 }
 
-/* Glass card */
+/* Glass card — landing page platform cards */
 .glass-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(10, 10, 12, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.glass-card:hover {
+  border-color: rgba(208, 188, 255, 0.4);
+  box-shadow: 0 0 20px rgba(208, 188, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Glass panel — admin form sections */
+.glass-panel {
+  background: rgba(18, 20, 20, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(200, 198, 200, 0.1);
+}
+
+/* Obsidian card — admin platform list */
+.obsidian-card {
+  background: #1a1c1c;
+  border: 1px solid rgba(200, 198, 200, 0.1);
+  transition: all 0.3s ease;
+}
+.obsidian-card:hover {
+  border-color: rgba(208, 188, 255, 0.4);
+  box-shadow: 0 0 25px rgba(208, 188, 255, 0.12);
+}
+
+/* Inner glow — purple tint inside cards */
+.inner-glow-purple {
+  box-shadow: inset 0 0 15px rgba(208, 188, 255, 0.05);
+}
+
+/* Hero background mesh — landing page */
+.bg-hero-mesh {
+  background-image:
+    radial-gradient(at 50% 0%, rgba(85, 22, 190, 0.15) 0%, transparent 70%),
+    radial-gradient(at 100% 100%, rgba(233, 195, 73, 0.05) 0%, transparent 50%);
+}
+
+/* Obsidian radial gradient — login page background */
+.obsidian-gradient {
+  background: radial-gradient(circle at center, #1e2020 0%, #121414 100%);
+}
+
+/* Arcane pattern — subtle SVG texture on login page */
+.arcane-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l2.598 15h-5.196L30 0zm0 60l-2.598-15h5.196L30 60zM0 30l15-2.598v5.196L0 30zm60 0l-15 2.598v-5.196L60 30zM15 15l1.83 10.258-7.66-7.66L15 15zm30 30l-1.83-10.258 7.66 7.66L45 45zm0-30l-10.258 1.83 7.66-7.66L45 15zM15 45l10.258-1.83-7.66 7.66L15 45z' fill='%23571bc1' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C%2Fsvg%3E");
+}
+
+/* Gold glow text — admin accents */
+.text-glow-amber {
+  text-shadow: 0 0 12px rgba(233, 195, 73, 0.4);
+}
+
+/* Dark scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0c0f0f; }
+::-webkit-scrollbar-thumb { background: #47464a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #d0bcff; }

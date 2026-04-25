@@ -18,7 +18,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-dark-bg">
+    <div className="flex min-h-screen bg-surface-container-lowest">
       {showForm && (
         <PlatformForm
           nextOrder={platforms.length}
@@ -26,101 +26,139 @@ export default function AdminPage() {
         />
       )}
 
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-dark-border bg-dark-bg/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <a
-              href="/"
-              className="text-gray-500 hover:text-white transition-colors text-sm"
-              title="Ver landing page"
-            >
-              ← Início
-            </a>
-            <span className="text-gray-700">/</span>
-            <h1 className="text-lg font-semibold text-white">Painel Admin</h1>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-gray-500 sm:block">
-              {user?.email}
-            </span>
-            <button
-              onClick={handleSignOut}
-              className="rounded-lg border border-dark-border px-3 py-1.5 text-sm text-gray-400
-                         hover:border-red-800 hover:text-red-400 transition-all"
-            >
-              Sair
-            </button>
-          </div>
+      {/* Sidebar */}
+      <aside className="h-screen w-64 fixed left-0 top-0 bg-[#0A0A0C] border-r border-purple-900/20 z-30 flex flex-col py-8">
+        <div className="px-6 mb-10">
+          <h1 className="text-tertiary font-display font-bold tracking-tight text-xl text-glow-amber">
+            ARCHIVIST
+          </h1>
+          <p className="text-on-primary-container text-xs mt-1 font-label uppercase tracking-widest">
+            Administrador
+          </p>
         </div>
-      </header>
 
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        {/* Page header */}
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-white">Plataformas</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Gerencie os acessos exibidos na landing page.{' '}
-              <span className="text-gray-600">
-                {platforms.length} plataforma{platforms.length !== 1 ? 's' : ''} cadastrada{platforms.length !== 1 ? 's' : ''}
-                {' · '}
-                {platforms.filter((p) => p.visible).length} visível{platforms.filter((p) => p.visible).length !== 1 ? 'is' : ''}
-              </span>
-            </p>
+        <nav className="flex-1 space-y-1 px-3">
+          <div className="flex items-center gap-3 px-4 py-3 bg-secondary-container/20 text-secondary border-r-4 border-secondary font-display text-sm font-medium">
+            <span className="material-symbols-outlined">dashboard</span>
+            Plataformas
           </div>
-
-          <button
-            onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-accent-purple px-5 py-2.5
-                       text-sm font-semibold text-white hover:bg-violet-600 transition-colors
-                       shadow-lg shadow-accent-purple/20"
+          <a
+            href="/"
+            className="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:text-on-surface hover:bg-white/5 hover:translate-x-1 transition-all font-display text-sm"
           >
-            <span className="text-base">+</span>
-            Nova Plataforma
+            <span className="material-symbols-outlined">language</span>
+            Ver Portal
+          </a>
+        </nav>
+
+        <div className="px-6 mt-auto pt-6 border-t border-white/5 space-y-3">
+          <p className="text-xs text-on-primary-container font-label truncate">{user?.email}</p>
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-2 text-xs text-on-primary-container hover:text-error transition-colors font-label uppercase tracking-widest"
+          >
+            <span className="material-symbols-outlined text-sm">logout</span>
+            Sair
           </button>
         </div>
+      </aside>
 
-        {/* Stats */}
-        <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {[
-            { label: 'Total', value: platforms.length, icon: '📦' },
-            { label: 'Visíveis', value: platforms.filter((p) => p.visible).length, icon: '👁' },
-            { label: 'Ocultas', value: platforms.filter((p) => !p.visible).length, icon: '🙈' },
-            {
-              label: 'Com Google',
-              value: platforms.filter((p) => p.authMethod === 'google' || p.authMethod === 'ambos').length,
-              icon: '🔑',
-            },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-xl border border-dark-border bg-dark-card px-4 py-3"
-            >
-              <div className="flex items-center gap-2 text-gray-500">
-                <span>{stat.icon}</span>
-                <span className="text-xs">{stat.label}</span>
-              </div>
-              <div className="mt-1 text-2xl font-bold text-white">{stat.value}</div>
+      {/* Main content */}
+      <main className="ml-64 flex-1 min-h-screen p-8">
+        {/* Top bar */}
+        <header className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-8">
+          <div>
+            <h2 className="font-display text-2xl font-bold text-on-surface tracking-tight">
+              System Overview
+            </h2>
+            <p className="text-on-primary-container text-sm font-sans mt-1">
+              Gerenciando as plataformas do PROTAGONISTA
+            </p>
+          </div>
+          <button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-2 bg-secondary text-on-secondary px-6 py-3 rounded-xl font-display text-sm font-semibold hover:shadow-[0_0_20px_rgba(208,188,255,0.4)] transition-all whitespace-nowrap"
+          >
+            <span className="material-symbols-outlined">add</span>
+            Nova Plataforma
+          </button>
+        </header>
+
+        {/* Bento stats grid */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="glass-panel p-5 rounded-xl flex flex-col justify-between h-32 inner-glow-purple border-l-4 border-tertiary">
+            <span className="font-label text-xs text-tertiary uppercase tracking-widest text-glow-amber">
+              Total
+            </span>
+            <span className="font-display text-4xl font-black text-on-surface">{platforms.length}</span>
+          </div>
+
+          <div className="glass-panel p-5 rounded-xl flex flex-col justify-between h-32 inner-glow-purple">
+            <div className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-secondary text-sm">visibility</span>
+              <span className="font-label text-xs text-secondary uppercase tracking-widest">Visíveis</span>
             </div>
-          ))}
+            <span className="font-display text-4xl font-black text-on-surface">
+              {platforms.filter((p) => p.visible).length}
+            </span>
+          </div>
+
+          <div className="glass-panel p-5 rounded-xl flex flex-col justify-between h-32 inner-glow-purple">
+            <div className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-on-primary-container text-sm">visibility_off</span>
+              <span className="font-label text-xs text-on-primary-container uppercase tracking-widest">Ocultas</span>
+            </div>
+            <span className="font-display text-4xl font-black text-on-surface">
+              {platforms.filter((p) => !p.visible).length}
+            </span>
+          </div>
+
+          <div className="glass-panel col-span-2 md:col-span-1 p-5 rounded-xl h-32 relative overflow-hidden group">
+            <div className="relative z-10">
+              <span className="font-label text-xs text-on-primary-container uppercase tracking-widest">
+                Google Auth
+              </span>
+              <div className="mt-3 flex items-center gap-3">
+                <div className="h-1.5 flex-1 bg-surface-container rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-secondary shadow-[0_0_8px_rgba(208,188,255,0.8)] rounded-full"
+                    style={{
+                      width: `${Math.max(5, (platforms.filter((p) => p.authMethod === 'google' || p.authMethod === 'ambos').length / Math.max(platforms.length, 1)) * 100)}%`,
+                    }}
+                  />
+                </div>
+                <span className="font-display font-bold text-on-surface text-sm">
+                  {platforms.filter((p) => p.authMethod === 'google' || p.authMethod === 'ambos').length}
+                </span>
+              </div>
+              <p className="text-[10px] text-on-primary-container mt-1.5 font-label uppercase tracking-widest">
+                plataformas
+              </p>
+            </div>
+            <div className="absolute inset-0 opacity-10 bg-gradient-to-r from-secondary/0 via-secondary/20 to-secondary/0 group-hover:translate-x-full transition-transform duration-1000" />
+          </div>
+        </section>
+
+        {/* Platform list */}
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="font-display text-lg font-bold text-on-surface">Plataformas Registradas</h3>
         </div>
 
-        {/* Tabela */}
         {error ? (
-          <div className="flex h-48 flex-col items-center justify-center gap-3 rounded-2xl border border-red-800/50 bg-red-900/10">
-            <p className="text-sm text-red-400">Erro ao carregar plataformas: {error}</p>
-            <p className="text-xs text-gray-600">Verifique as regras do Firestore e tente recarregar a página.</p>
+          <div className="glass-panel rounded-xl p-8 text-center border-l-4 border-error">
+            <p className="text-sm text-error mb-1">Erro ao carregar plataformas: {error}</p>
+            <p className="text-xs text-on-primary-container">
+              Verifique as regras do Firestore e recarregue a página.
+            </p>
           </div>
         ) : loading ? (
           <div className="flex h-48 items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-dark-border border-t-accent-purple" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-outline-variant border-t-secondary" />
           </div>
         ) : (
           <PlatformTable platforms={platforms} />
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

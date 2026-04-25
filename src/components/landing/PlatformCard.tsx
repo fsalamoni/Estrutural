@@ -3,6 +3,13 @@
 import Image from 'next/image';
 import { Platform, AUTH_METHOD_LABELS, AUTH_METHOD_COLORS } from '@/lib/types';
 
+const AUTH_METHOD_ICONS: Record<Platform['authMethod'], string> = {
+  email: 'mail',
+  google: 'account_circle',
+  ambos: 'lock_open',
+  nenhum: 'link',
+};
+
 interface Props {
   platform: Platform;
 }
@@ -13,58 +20,64 @@ export default function PlatformCard({ platform }: Props) {
       href={platform.accessUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block rounded-2xl border border-dark-border bg-glass backdrop-blur-sm p-6
-                 hover:border-accent-purple/50 hover:bg-dark-hover
-                 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg
-                 hover:shadow-accent-purple/10 animate-fade-in"
+      className="glass-card inner-glow-purple rounded-xl p-8 flex flex-col items-start group animate-fade-in"
     >
-      {/* Ícone */}
-      <div className="mb-4 flex items-center gap-4">
-        <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl
-                        border border-dark-border bg-dark-bg">
-          {platform.iconUrl ? (
+      {/* Icon */}
+      <div
+        className={`w-12 h-12 rounded-lg flex items-center justify-center mb-6 border transition-all
+          ${platform.iconUrl
+            ? 'bg-surface-container-low border-outline-variant group-hover:border-secondary'
+            : 'bg-secondary-container/10 border-secondary/20 group-hover:border-secondary'
+          }`}
+      >
+        {platform.iconUrl ? (
+          <div className="relative w-8 h-8">
             <Image
               src={platform.iconUrl}
               alt={`Logo de ${platform.name}`}
               fill
-              className="object-contain p-2"
+              className="object-contain"
               unoptimized
             />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-2xl font-bold
-                            text-accent-glow">
-              {platform.name.charAt(0).toUpperCase()}
-            </div>
-          )}
-        </div>
-
-        <div className="min-w-0">
-          <h3 className="truncate text-lg font-semibold text-white group-hover:text-accent-glow
-                         transition-colors">
-            {platform.name}
-          </h3>
+          </div>
+        ) : (
           <span
-            className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium
-                        ${AUTH_METHOD_COLORS[platform.authMethod]}`}
+            className="material-symbols-outlined text-secondary text-2xl"
+            style={{ fontVariationSettings: "'FILL' 1" }}
           >
-            {AUTH_METHOD_LABELS[platform.authMethod]}
+            {AUTH_METHOD_ICONS[platform.authMethod]}
           </span>
-        </div>
+        )}
       </div>
 
-      {/* Descrição */}
+      {/* Name */}
+      <h3 className="font-display font-semibold text-2xl leading-snug text-white mb-3 group-hover:text-secondary transition-colors">
+        {platform.name}
+      </h3>
+
+      {/* Description */}
       {platform.description && (
-        <p className="text-sm leading-relaxed text-gray-400 group-hover:text-gray-300
-                      transition-colors line-clamp-3">
+        <p className="font-sans text-base text-on-surface-variant mb-6 flex-grow line-clamp-3 leading-relaxed">
           {platform.description}
         </p>
       )}
 
-      {/* CTA */}
-      <div className="mt-4 flex items-center gap-1 text-sm font-medium text-accent-glow
-                      opacity-0 group-hover:opacity-100 transition-opacity">
-        <span>Acessar plataforma</span>
-        <span className="translate-x-0 transition-transform group-hover:translate-x-1">→</span>
+      {/* Auth badge + CTA */}
+      <div className="mt-auto w-full space-y-4">
+        <div
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-label uppercase tracking-wider
+            ${AUTH_METHOD_COLORS[platform.authMethod]}`}
+        >
+          <span className="material-symbols-outlined text-sm">{AUTH_METHOD_ICONS[platform.authMethod]}</span>
+          {AUTH_METHOD_LABELS[platform.authMethod]}
+        </div>
+
+        <div className="flex items-center gap-2 text-sm font-display text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+          <span>Acessar plataforma</span>
+          <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">
+            arrow_forward
+          </span>
+        </div>
       </div>
     </a>
   );
