@@ -4,7 +4,17 @@ import { usePublicPlatforms } from '@/hooks/usePlatforms';
 import PlatformCard from './PlatformCard';
 
 export default function PlatformGrid() {
-  const { platforms, loading } = usePublicPlatforms();
+  const { platforms, loading, error } = usePublicPlatforms();
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <div className="mb-4 text-5xl">⚠️</div>
+        <p className="text-lg font-medium text-gray-400">Não foi possível carregar as plataformas.</p>
+        <p className="mt-1 text-sm text-gray-600">Verifique sua conexão e recarregue a página.</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -22,7 +22,8 @@ function docToPlatform(id: string, data: DocumentData): Platform {
 }
 
 export function subscribePublicPlatforms(
-  callback: (platforms: Platform[]) => void
+  callback: (platforms: Platform[]) => void,
+  onError?: (err: Error) => void
 ): () => void {
   const q = query(
     collection(db, COLLECTION),
@@ -30,22 +31,27 @@ export function subscribePublicPlatforms(
     orderBy('order', 'asc')
   ) as Query<DocumentData>;
 
-  return onSnapshot(q, (snap) => {
-    callback(snap.docs.map((d) => docToPlatform(d.id, d.data())));
-  });
+  return onSnapshot(
+    q,
+    (snap) => callback(snap.docs.map((d) => docToPlatform(d.id, d.data()))),
+    (err) => onError?.(err)
+  );
 }
 
 export function subscribeAllPlatforms(
-  callback: (platforms: Platform[]) => void
+  callback: (platforms: Platform[]) => void,
+  onError?: (err: Error) => void
 ): () => void {
   const q = query(
     collection(db, COLLECTION),
     orderBy('order', 'asc')
   ) as Query<DocumentData>;
 
-  return onSnapshot(q, (snap) => {
-    callback(snap.docs.map((d) => docToPlatform(d.id, d.data())));
-  });
+  return onSnapshot(
+    q,
+    (snap) => callback(snap.docs.map((d) => docToPlatform(d.id, d.data()))),
+    (err) => onError?.(err)
+  );
 }
 
 export async function createPlatform(data: PlatformInput): Promise<string> {

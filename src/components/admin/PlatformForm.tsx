@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Platform, PlatformInput } from '@/lib/types';
 import { createPlatform, updatePlatform } from '@/lib/firebase/firestore';
 import { uploadPlatformIcon } from '@/lib/firebase/storage';
+import { toast } from '@/components/ui/Toast';
 
 interface Props {
   platform?: Platform;
@@ -75,6 +76,7 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
         }
       }
 
+      toast(isEditing ? 'Plataforma atualizada com sucesso' : 'Plataforma criada com sucesso');
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao salvar plataforma');

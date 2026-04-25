@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Protagonista RPG — Plataformas',
   description: 'Hub central de acesso às plataformas Protagonista RPG',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.svg',
   },
 };
 

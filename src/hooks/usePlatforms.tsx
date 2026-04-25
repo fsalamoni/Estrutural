@@ -7,29 +7,45 @@ import { subscribePublicPlatforms, subscribeAllPlatforms } from '@/lib/firebase/
 export function usePublicPlatforms() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = subscribePublicPlatforms((data) => {
-      setPlatforms(data);
-      setLoading(false);
-    });
+    const unsubscribe = subscribePublicPlatforms(
+      (data) => {
+        setPlatforms(data);
+        setLoading(false);
+        setError(null);
+      },
+      (err) => {
+        setError(err.message);
+        setLoading(false);
+      }
+    );
     return unsubscribe;
   }, []);
 
-  return { platforms, loading };
+  return { platforms, loading, error };
 }
 
 export function useAllPlatforms() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = subscribeAllPlatforms((data) => {
-      setPlatforms(data);
-      setLoading(false);
-    });
+    const unsubscribe = subscribeAllPlatforms(
+      (data) => {
+        setPlatforms(data);
+        setLoading(false);
+        setError(null);
+      },
+      (err) => {
+        setError(err.message);
+        setLoading(false);
+      }
+    );
     return unsubscribe;
   }, []);
 
-  return { platforms, loading };
+  return { platforms, loading, error };
 }

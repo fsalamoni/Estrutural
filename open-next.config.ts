@@ -1,23 +1,8 @@
-import type { OpenNextConfig } from "@opennextjs/cloudflare";
+import { defineCloudflareConfig } from "@opennextjs/cloudflare";
+import staticAssetsIncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/static-assets-incremental-cache";
 
-const config: OpenNextConfig = {
-  default: {
-    override: {
-      wrapper: "cloudflare-node",
-      converter: "edge",
-      incrementalCache: "dummy",
-      tagCache: "dummy",
-      queue: "dummy",
-    },
-  },
-  middleware: {
-    external: true,
-    override: {
-      wrapper: "cloudflare-edge",
-      converter: "edge",
-      proxyExternalRequest: "fetch",
-    },
-  },
-};
-
-export default config;
+// Static assets cache: ideal para este projeto onde todos os dados
+// são carregados client-side via Firebase (sem SSR/ISR). Não requer R2 bucket.
+export default defineCloudflareConfig({
+  incrementalCache: staticAssetsIncrementalCache,
+});

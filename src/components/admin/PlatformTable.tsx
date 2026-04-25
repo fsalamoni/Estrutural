@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Platform, AUTH_METHOD_LABELS } from '@/lib/types';
 import { deletePlatform, toggleVisibility } from '@/lib/firebase/firestore';
+import { toast } from '@/components/ui/Toast';
 import PlatformForm from './PlatformForm';
 
 interface Props {
@@ -13,10 +14,28 @@ interface Props {
 export default function PlatformTable({ platforms }: Props) {
   const [editing, setEditing] = useState<Platform | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   async function handleDelete(id: string) {
-    await deletePlatform(id);
-    setConfirmDelete(null);
+    setDeleting(true);
+    try {
+      await deletePlatform(id);
+      setConfirmDelete(null);
+      toast('Plataforma excluída com sucesso');
+    } catch {
+      toast('Erro ao excluir plataforma. Tente novamente.', 'error');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  async function handleToggle(id: string, currentVisible: boolean) {
+    try {
+      await toggleVisibility(id, !currentVisible);
+      toast(!currentVisible ? 'Plataforma exibida na landing page' : 'Plataforma ocultada');
+    } catch {
+      toast('Erro ao alterar visibilidade.', 'error');
+    }
   }
 
   return (
@@ -46,10 +65,11 @@ export default function PlatformTable({ platforms }: Props) {
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
+                disabled={deleting}
                 className="flex-1 rounded-xl bg-red-700 py-2 text-sm font-semibold text-white
-                           hover:bg-red-600 transition-colors"
+                           hover:bg-red-600 transition-colors disabled:opacity-60"
               >
-                Excluir
+                {deleting ? 'Excluindo...' : 'Excluir'}
               </button>
             </div>
           </div>
@@ -115,10 +135,12 @@ export default function PlatformTable({ platforms }: Props) {
                   </td>
                   <td className="px-4 py-4 text-center">
                     <button
-                      onClick={() => toggleVisibility(p.id, !p.visible)}
+                      role="switch"
+                      aria-checked={p.visible}
+                      aria-label={`${p.visible ? 'Ocultar' : 'Exibir'} ${p.name}`}
+                      onClick={() => handleToggle(p.id, p.visible)}
                       className={`relative inline-flex h-5 w-9 rounded-full transition-colors
                         ${p.visible ? 'bg-accent-purple' : 'bg-gray-700'}`}
-                      title={p.visible ? 'Clique para ocultar' : 'Clique para exibir'}
                     >
                       <span
                         className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow

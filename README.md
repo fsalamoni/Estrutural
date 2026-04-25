@@ -4,92 +4,73 @@ Landing page pública com painel admin para gerenciar acessos às plataformas em
 
 ## Stack
 
-- **Next.js 16** (App Router + TypeScript)
-- **Tailwind CSS** (tema dark com glassmorphism)
-- **Firebase** (Auth + Firestore + Storage)
-- **Cloudflare Pages** (hospedagem via OpenNext)
+- **Next.js 16** · TypeScript · Tailwind CSS
+- **Firebase** · Auth + Firestore + Storage
+- **Cloudflare Workers** · Deploy via `@opennextjs/cloudflare`
+- **GitHub Actions** · CI/CD automático no push para `main`
 
 ---
 
-## Configuração Inicial (Obrigatório antes do deploy)
+## O que você precisa configurar (uma vez só)
 
-### 1. Firebase Console
+### Passo 1 — Firebase Console
 
 #### 1.1 Criar projeto
-1. Acesse [console.firebase.google.com](https://console.firebase.google.com)
-2. Clique em **"Add project"** → nome: `estrutural` (ou similar)
-3. Desative o Google Analytics (opcional) → **Create project**
+1. [console.firebase.google.com](https://console.firebase.google.com) → **Add project**
+2. Nome: `protagonistarpg` (ou similar) → criar
 
 #### 1.2 Habilitar autenticação
-1. Sidebar: **Build > Authentication > Get started**
-2. Aba **Sign-in method**:
-   - Habilitar **Email/Password**
-   - Habilitar **Google** (defina um e-mail de suporte)
-3. Aba **Settings > Authorized domains** → adicionar:
+1. **Build > Authentication > Get started**
+2. Habilitar **Email/Password** e **Google** (defina e-mail de suporte)
+3. **Settings > Authorized domains** → adicionar:
    - `localhost`
    - `protagonistarpg.com.br`
    - `www.protagonistarpg.com.br`
-   - `[seu-projeto].pages.dev` *(domínio automático Cloudflare Pages)*
 
 #### 1.3 Criar usuário admin
 1. **Authentication > Users > Add user**
-2. Insira seu e-mail e uma senha forte
-3. ⚠️ **Copie o UID gerado** — você vai precisar dele nas etapas seguintes
+2. Insira seu e-mail e senha forte
+3. ⚠️ **Copie o UID gerado** (você vai usá-lo nos próximos passos)
 
 #### 1.4 Criar Firestore Database
 1. **Build > Firestore Database > Create database**
-2. Modo: **Production mode** ✓
-3. Região: **`southamerica-east1`** (mais próxima do Brasil)
-4. Aba **Rules** → cole e publique:
+2. Modo: **Production** · Região: **`southamerica-east1`**
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /platforms/{platformId} {
-      allow read: if resource.data.visible == true
-                  || (request.auth != null && request.auth.uid == "SEU_UID_AQUI");
-      allow write: if request.auth != null
-                   && request.auth.uid == "SEU_UID_AQUI";
-    }
-  }
-}
-```
-
-> Substitua **`SEU_UID_AQUI`** pelo UID copiado no passo 1.3
-
-#### 1.5 Habilitar Firebase Storage
-1. **Build > Storage > Get started** → Production mode
+#### 1.5 Habilitar Storage
+1. **Build > Storage > Get started** · Modo: Production
 2. Mesma região: `southamerica-east1`
-3. Aba **Rules** → cole e publique:
-
-```
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /platform-icons/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null
-                   && request.auth.uid == "SEU_UID_AQUI";
-    }
-  }
-}
-```
 
 #### 1.6 Registrar Web App
 1. **Project Overview > Add app > Web** (`</>`)
-2. Nome: `estrutural-web` | **NÃO** habilitar Firebase Hosting
-3. Copie o objeto `firebaseConfig` — você vai precisar desses valores
+2. Nome: `estrutural-web` · **NÃO** habilitar Firebase Hosting
+3. Copie o objeto `firebaseConfig` (você vai precisar dos valores)
 
 ---
 
-### 2. Variáveis de Ambiente (Local)
+### Passo 2 — Deploy das regras com o script automático
 
-Copie `.env.example` para `.env.local` e preencha com os valores do Firebase:
+Após preencher `.env.local` (próximo passo) e `.firebaserc`:
+
+```bash
+# 1. Edite .firebaserc e substitua FIREBASE_PROJECT_ID_PLACEHOLDER pelo ID do seu projeto
+# 2. Preencha .env.local com os valores do Firebase (veja seção abaixo)
+# 3. Execute:
+bash scripts/setup-firebase.sh
+```
+
+O script faz tudo automaticamente:
+- Injeta seu UID nas regras do Firestore e Storage
+- Faz deploy das regras e índices no Firebase
+
+---
+
+### Passo 3 — Variáveis de ambiente (.env.local para desenvolvimento)
 
 ```bash
 cp .env.example .env.local
 ```
+
+Preencha com os valores do Firebase Console:
 
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
@@ -103,60 +84,53 @@ NEXT_PUBLIC_ADMIN_UID=uid-copiado-do-firebase-authentication
 
 ---
 
-### 3. Cloudflare Pages
+### Passo 4 — GitHub Secrets (para deploy automático)
 
-#### 3.1 Criar Pages project
-1. Cloudflare Dashboard → **Workers & Pages > Create application > Pages**
-2. **Connect to Git** → selecionar repositório `fsalamoni/Estrutural`
-3. Build settings:
-   - **Build command**: `npx @opennextjs/cloudflare build`
-   - **Build output directory**: `.open-next/assets`
-   - **Root directory**: `/`
-4. Salvar e fazer o primeiro deploy
+No repositório GitHub: **Settings > Secrets and variables > Actions > New repository secret**
 
-#### 3.2 Variáveis de ambiente no Cloudflare
-**Pages > Settings > Environment variables** → adicionar (scope: Production + Preview):
+Adicione os 9 secrets abaixo:
 
-| Variável | Valor |
-|----------|-------|
-| `NEXT_PUBLIC_FIREBASE_API_KEY` | Da etapa 1.6 |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Da etapa 1.6 |
-| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Da etapa 1.6 |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Da etapa 1.6 |
-| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Da etapa 1.6 |
-| `NEXT_PUBLIC_FIREBASE_APP_ID` | Da etapa 1.6 |
-| `NEXT_PUBLIC_ADMIN_UID` | UID do passo 1.3 |
-| `NODE_VERSION` | `20` |
+| Secret | Onde encontrar |
+|--------|---------------|
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Console → Project Settings → Web App |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | idem |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | idem |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | idem |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | idem |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | idem |
+| `NEXT_PUBLIC_ADMIN_UID` | Firebase Console → Authentication → Users → seu UID |
+| `CLOUDFLARE_API_TOKEN` | ver abaixo |
+| `CLOUDFLARE_ACCOUNT_ID` | ver abaixo |
 
-#### 3.3 Compatibility flags (obrigatório)
-**Pages > Settings > Functions > Compatibility flags** → adicionar:
-- Flag: **`nodejs_compat`**
-- Aplicar em **Production** e **Preview**
+**Como obter o Cloudflare API Token:**
+1. [dash.cloudflare.com](https://dash.cloudflare.com) → **My Profile > API Tokens**
+2. **Create Token** → usar template **"Edit Cloudflare Workers"**
+3. Configurar:
+   - Account: sua conta Cloudflare
+   - Zone Resources: All zones (ou selecionar `protagonistarpg.com.br`)
+4. Copiar o token gerado → adicionar como `CLOUDFLARE_API_TOKEN`
 
-#### 3.4 Adicionar domínio personalizado
-1. **Pages > Custom domains > Set up a custom domain**
-2. Digite: `protagonistarpg.com.br`
-3. Como o domínio já está no Cloudflare, o registro CNAME é criado automaticamente
-4. Repita para `www.protagonistarpg.com.br`
+**Como obter o Cloudflare Account ID:**
+1. Qualquer página do Cloudflare Dashboard
+2. Barra lateral direita → **Account ID** (string de 32 caracteres)
 
 ---
 
-### 4. Adicionar Sub-plataformas no Domínio
+### Passo 5 — Domínio personalizado no Cloudflare
 
-Para cada nova plataforma sua em `*.protagonistarpg.com.br`:
+Após o primeiro deploy automático via GitHub Actions:
 
-**Cloudflare DNS (Dashboard → protagonistarpg.com.br → DNS):**
+1. Cloudflare Dashboard → **Workers & Pages**
+2. Clique no Worker **`estrutural`**
+3. **Settings > Domains & Routes > Add Custom Domain**
+4. Adicionar: `protagonistarpg.com.br`
+5. Adicionar: `www.protagonistarpg.com.br`
 
-| Type | Name | Content | Proxy |
-|------|------|---------|-------|
-| CNAME | `gmtools` | `seu-worker.workers.dev` ou `projeto.pages.dev` | ☁️ Proxied |
-| CNAME | `discord` | `seu-projeto.pages.dev` | ☁️ Proxied |
-
-Então no painel admin, use a URL `https://gmtools.protagonistarpg.com.br` no campo "URL de Acesso".
+Como o domínio já está no Cloudflare, o DNS é configurado automaticamente.
 
 ---
 
-## Desenvolvimento Local
+## Desenvolvimento local
 
 ```bash
 # Instalar dependências
@@ -165,14 +139,16 @@ npm install --legacy-peer-deps
 # Rodar em modo desenvolvimento
 npm run dev
 
-# Build para verificar erros
+# Build de verificação
 npm run build:next
 
-# Type check
-npm run type-check
+# Build completo (Cloudflare Worker)
+npm run build
+
+# Preview local do Worker compilado
+npm run preview
 ```
 
-Acesse:
 - **Landing page**: http://localhost:3000
 - **Painel admin**: http://localhost:3000/admin/login
 
@@ -180,7 +156,10 @@ Acesse:
 
 ## Deploy
 
-O deploy é automático via GitHub: cada push para `main` aciona o build no Cloudflare Pages.
+Deploy é **automático**: cada push para `main` dispara o GitHub Actions que:
+1. Faz type check e lint
+2. Compila com `@opennextjs/cloudflare`
+3. Faz deploy no Cloudflare Workers via `wrangler deploy`
 
 ```bash
 git add .
@@ -188,12 +167,54 @@ git commit -m "sua mensagem"
 git push origin main
 ```
 
+Para deploy manual:
+```bash
+npm run deploy
+```
+
 ---
 
-## Arquitetura de Segurança
+## Segurança (3 camadas)
 
-A rota `/admin` é protegida em 3 camadas:
+| Camada | Onde | O que faz |
+|--------|------|-----------|
+| Edge Proxy | `src/proxy.ts` | Bloqueia `/admin/*` sem cookie de sessão |
+| API Route | `src/app/api/auth/session/route.ts` | Define cookie com flag `HttpOnly` server-side |
+| Client Guard | `AuthGuard.tsx` | Redireciona se Firebase Auth retorna null |
+| Firestore Rules | Firebase Console | UID do admin hard-coded; sem UID = sem escrita |
 
-1. **Edge Proxy** (`src/proxy.ts`) — verifica cookie `__session` antes de carregar a página
-2. **Client Guard** (`AuthGuard.tsx`) — verifica Firebase Auth em tempo real no browser  
-3. **Regras Firestore/Storage** — UID do admin hard-coded; sem UID correto = sem escrita no banco
+---
+
+## Estrutura do projeto
+
+```
+src/
+├── app/
+│   ├── page.tsx                  # Landing page pública
+│   ├── not-found.tsx             # Página 404
+│   ├── admin/
+│   │   ├── page.tsx              # Dashboard admin (CRUD)
+│   │   ├── layout.tsx            # Wraps com AuthGuard + Toast
+│   │   └── login/page.tsx        # Login admin
+│   └── api/auth/session/route.ts # Gerencia cookie HttpOnly
+├── components/
+│   ├── landing/                  # PlatformCard, PlatformGrid
+│   ├── admin/                    # AuthGuard, PlatformForm, PlatformTable, InstructionsPanel
+│   └── ui/Toast.tsx              # Notificações
+├── hooks/
+│   ├── useAuth.tsx               # Firebase Auth context
+│   └── usePlatforms.tsx          # Realtime data + error state
+├── lib/firebase/                 # config, auth, firestore, storage
+└── proxy.ts                      # Edge middleware (Next.js 16)
+
+Firebase/
+├── firestore.rules               # Regras do banco (deploy: setup-firebase.sh)
+├── storage.rules                 # Regras do storage
+├── firestore.indexes.json        # Índices compostos
+└── firebase.json                 # Configuração do Firebase CLI
+
+Deploy/
+├── wrangler.toml                 # Configuração do Cloudflare Worker
+├── open-next.config.ts           # Adaptador OpenNext para Cloudflare
+└── .github/workflows/deploy.yml  # CI/CD automático
+```
