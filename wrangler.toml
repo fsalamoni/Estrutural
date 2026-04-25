@@ -1,0 +1,8 @@
+name = "estrutural"
+compatibility_date = "2024-12-18"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".open-next/assets"
+
+[vars]
+# As variáveis NEXT_PUBLIC_* são configuradas no Cloudflare Pages Dashboard
+# Workers & Pages > estrutural > Settings > Environment variables
