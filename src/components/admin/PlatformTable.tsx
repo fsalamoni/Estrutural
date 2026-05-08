@@ -3,11 +3,10 @@
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import {
-  Platform,
-  Category,
-  AUTH_METHOD_LABELS,
   AUTH_METHOD_COLORS,
-  getCategoryColorClass,
+  AUTH_METHOD_LABELS,
+  getPlatformCategory,
+  Platform,
 } from '@/lib/types';
 import { deletePlatform, toggleVisibility, updateOrder } from '@/lib/firebase/firestore';
 import { toast } from '@/components/ui/Toast';
@@ -255,6 +254,11 @@ export default function PlatformTable({ platforms, categories }: Props) {
                         Sem categoria
                       </span>
                     )}
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span className="rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1 text-[10px] font-label font-bold uppercase text-on-surface-variant">
+                        {getPlatformCategory(p)}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-1">

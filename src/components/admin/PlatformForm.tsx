@@ -2,7 +2,12 @@
 
 import { useState, useRef, FormEvent, useEffect } from 'react';
 import Image from 'next/image';
-import { Platform, PlatformInput } from '@/lib/types';
+import {
+  DEFAULT_PLATFORM_CATEGORY,
+  PLATFORM_CATEGORY_SUGGESTIONS,
+  Platform,
+  PlatformInput,
+} from '@/lib/types';
 import { createPlatform, updatePlatform } from '@/lib/firebase/firestore';
 import { uploadPlatformIcon, deletePlatformIcon, isFirebaseStorageUrl } from '@/lib/firebase/storage';
 import { useCategories } from '@/hooks/usePlatforms';
@@ -17,6 +22,7 @@ interface Props {
 const EMPTY: PlatformInput = {
   name: '',
   description: '',
+  category: DEFAULT_PLATFORM_CATEGORY,
   accessUrl: '',
   iconUrl: '',
   authMethod: 'email',
@@ -33,6 +39,7 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
       ? {
           name: platform.name,
           description: platform.description,
+          category: platform.category,
           accessUrl: platform.accessUrl,
           iconUrl: platform.iconUrl,
           authMethod: platform.authMethod,
@@ -199,6 +206,24 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
                 placeholder="Descreva brevemente o que é essa plataforma..."
                 className="w-full resize-none bg-surface-container-lowest border-b border-outline-variant focus:border-tertiary text-on-surface py-3 px-0 placeholder:text-outline/50 focus:outline-none transition-colors"
               />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="font-label text-xs text-on-surface-variant uppercase tracking-widest">
+                Categoria
+              </label>
+              <input
+                list="platform-category-options"
+                value={form.category}
+                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                placeholder="Ex: Trabalho, IA, RPG, Jogos, Outros"
+                className="w-full bg-surface-container-lowest border-b border-outline-variant focus:border-tertiary text-on-surface py-3 px-0 placeholder:text-outline/50 focus:outline-none transition-colors"
+              />
+              <datalist id="platform-category-options">
+                {PLATFORM_CATEGORY_SUGGESTIONS.map((category) => (
+                  <option key={category} value={category} />
+                ))}
+              </datalist>
             </div>
           </section>
 

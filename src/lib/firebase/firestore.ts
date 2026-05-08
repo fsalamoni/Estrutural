@@ -13,15 +13,19 @@ import {
   DocumentData,
   getDocs,
 } from 'firebase/firestore';
-import { db } from './config';
+import { getDb } from './config';
 import { deletePlatformIcon } from './storage';
-import { Platform, PlatformInput, Category, CategoryInput } from '../types';
+import { getPlatformCategory, Platform, PlatformInput } from '../types';
 
 const COLLECTION = 'platforms';
 const CATEGORIES_COLLECTION = 'categories';
 
 function docToPlatform(id: string, data: DocumentData): Platform {
-  return { id, ...data } as Platform;
+  return {
+    id,
+    ...data,
+    category: getPlatformCategory(typeof data.category === 'string' ? data.category : null),
+  } as Platform;
 }
 
 function docToCategory(id: string, data: DocumentData): Category {
@@ -32,15 +36,19 @@ export function subscribePublicPlatforms(
   callback: (platforms: Platform[]) => void,
   onError?: (err: Error) => void
 ): () => void {
+  const db = getDb();
   const q = query(
     collection(db, COLLECTION),
-    where('visible', '==', true),
-    orderBy('order', 'asc')
+    where('visible', '==', true)
   ) as Query<DocumentData>;
 
   return onSnapshot(
     q,
-    (snap) => callback(snap.docs.map((d) => docToPlatform(d.id, d.data()))),
+    (snap) => callback(
+      snap.docs
+        .map((d) => docToPlatform(d.id, d.data()))
+        .sort((left, right) => left.order - right.order)
+    ),
     (err) => onError?.(err)
   );
 }
@@ -49,6 +57,7 @@ export function subscribeAllPlatforms(
   callback: (platforms: Platform[]) => void,
   onError?: (err: Error) => void
 ): () => void {
+  const db = getDb();
   const q = query(
     collection(db, COLLECTION),
     orderBy('order', 'asc')
@@ -62,6 +71,7 @@ export function subscribeAllPlatforms(
 }
 
 export async function createPlatform(data: PlatformInput): Promise<string> {
+  const db = getDb();
   const ref = await addDoc(collection(db, COLLECTION), {
     ...data,
     createdAt: serverTimestamp(),
@@ -74,6 +84,7 @@ export async function updatePlatform(
   id: string,
   data: Partial<PlatformInput>
 ): Promise<void> {
+  const db = getDb();
   await updateDoc(doc(db, COLLECTION, id), {
     ...data,
     updatedAt: serverTimestamp(),
@@ -81,11 +92,13 @@ export async function updatePlatform(
 }
 
 export async function deletePlatform(id: string, iconUrl?: string): Promise<void> {
+  const db = getDb();
   await deleteDoc(doc(db, COLLECTION, id));
   if (iconUrl) await deletePlatformIcon(iconUrl);
 }
 
 export async function toggleVisibility(id: string, visible: boolean): Promise<void> {
+  const db = getDb();
   await updateDoc(doc(db, COLLECTION, id), {
     visible,
     updatedAt: serverTimestamp(),
@@ -93,6 +106,7 @@ export async function toggleVisibility(id: string, visible: boolean): Promise<vo
 }
 
 export async function updateOrder(id: string, order: number): Promise<void> {
+  const db = getDb();
   await updateDoc(doc(db, COLLECTION, id), { order });
 }
 

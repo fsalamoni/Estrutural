@@ -1,11 +1,12 @@
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from './config';
+import { getStorageService } from './config';
 
 export function isFirebaseStorageUrl(url: string): boolean {
   return url.includes('firebasestorage.googleapis.com');
 }
 
 function storageRefFromUrl(url: string) {
+  const storage = getStorageService();
   // Parse path from Firebase Storage HTTPS URL:
   // https://firebasestorage.googleapis.com/v0/b/BUCKET/o/path%2Fto%2Ffile?token=...
   const pathEncoded = url.split('/o/')[1]?.split('?')[0];
@@ -14,6 +15,7 @@ function storageRefFromUrl(url: string) {
 }
 
 export async function uploadPlatformIcon(file: File, platformId: string): Promise<string> {
+  const storage = getStorageService();
   const ext = file.name.split('.').pop()?.toLowerCase() ?? 'png';
   const path = `platform-icons/${platformId}.${ext}`;
   const storageRef = ref(storage, path);

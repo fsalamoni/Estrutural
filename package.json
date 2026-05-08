@@ -7,12 +7,14 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "npx @opennextjs/cloudflare build",
+    "build": "next build",
     "build:next": "next build",
-    "preview": "npx wrangler dev",
-    "deploy": "npm run build && npx wrangler deploy",
-    "start": "next start",
-    "lint": "next lint",
+    "build:cloudflare": "npx @opennextjs/cloudflare build",
+    "preview": "firebase emulators:start --only hosting",
+    "preview:cloudflare": "npx wrangler dev",
+    "deploy": "npm run build && npx firebase-tools deploy --project hocapp-44760 --only hosting,firestore:rules,storage",
+    "start": "firebase emulators:start --only hosting",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -30,6 +32,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^16.2.4",
+    "firebase-tools": "^14.22.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.1",
     "typescript": "^5",

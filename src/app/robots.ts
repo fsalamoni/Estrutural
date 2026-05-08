@@ -1,5 +1,7 @@
 import type { MetadataRoute } from 'next';
 
+export const dynamic = 'force-static';
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -9,6 +11,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin', '/admin/', '/api/'],
       },
     ],
-    sitemap: 'https://protagonistarpg.com.br/sitemap.xml',
+    sitemap: 'https://fsalomone.web.app/sitemap.xml',
   };
 }

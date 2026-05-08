@@ -1,8 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { usePublicPlatforms, useCategories } from '@/hooks/usePlatforms';
-import { Category, Platform, getCategoryColorClass } from '@/lib/types';
+import { usePublicPlatforms } from '@/hooks/usePlatforms';
+import { comparePlatformCategories, getPlatformCategory, Platform } from '@/lib/types';
 import PlatformCard from './PlatformCard';
 
 export default function PlatformGrid() {
@@ -80,53 +79,35 @@ export default function PlatformGrid() {
     );
   }
 
-  if (groups.length <= 1) {
-    return (
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {platforms.map((platform) => (
-          <PlatformCard
-            key={platform.id}
-            platform={platform}
-            category={platform.categoryId ? categoryById.get(platform.categoryId) : undefined}
-          />
-        ))}
-      </div>
-    );
-  }
+  const groupedPlatforms = Array.from(
+    platforms.reduce((sections, platform) => {
+      const category = getPlatformCategory(platform);
+      const categoryPlatforms = sections.get(category) ?? [];
+      categoryPlatforms.push(platform);
+      sections.set(category, categoryPlatforms);
+      return sections;
+    }, new Map<string, Platform[]>()).entries()
+  ).sort(([leftCategory], [rightCategory]) => comparePlatformCategories(leftCategory, rightCategory));
 
   return (
     <div className="space-y-12">
-      {groups.map(({ category, items }) => (
-        <section key={category?.id ?? 'uncategorized'} className="space-y-5">
-          <header className="flex items-center gap-3">
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-label uppercase tracking-wider ${
-                category
-                  ? getCategoryColorClass(category.color)
-                  : 'border-outline-variant text-on-surface-variant'
-              }`}
-            >
-              <span className="material-symbols-outlined text-sm">
-                {category?.icon || 'apps'}
-              </span>
-              {category?.name ?? 'Outras plataformas'}
+      {groupedPlatforms.map(([category, sectionPlatforms]) => (
+        <section key={category}>
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <p className="font-label text-[11px] uppercase tracking-[0.18em] text-on-primary-container">
+                Tipo de Plataforma
+              </p>
+              <h2 className="font-display text-2xl font-bold text-white mt-1">{category}</h2>
+            </div>
+            <span className="rounded-full border border-outline-variant bg-surface-container/70 px-3 py-1 text-[11px] font-label uppercase tracking-widest text-on-surface-variant">
+              {sectionPlatforms.length} {sectionPlatforms.length === 1 ? 'plataforma' : 'plataformas'}
             </span>
-            <span className="text-xs text-on-primary-container font-label uppercase tracking-widest">
-              {items.length} {items.length === 1 ? 'plataforma' : 'plataformas'}
-            </span>
-            {category?.description && (
-              <span className="text-xs text-on-surface-variant font-sans hidden md:inline-block">
-                · {category.description}
-              </span>
-            )}
-          </header>
+          </div>
+
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((platform) => (
-              <PlatformCard
-                key={platform.id}
-                platform={platform}
-                category={category ?? undefined}
-              />
+            {sectionPlatforms.map((platform) => (
+              <PlatformCard key={platform.id} platform={platform} />
             ))}
           </div>
         </section>

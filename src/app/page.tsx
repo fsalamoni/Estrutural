@@ -6,7 +6,7 @@ export default function HomePage() {
       {/* Top bar */}
       <header className="bg-[#0A0A0C]/80 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4">
         <span className="text-xl font-black tracking-[0.15em] text-white uppercase font-display">
-          PROTAGONISTA
+          SALOMONE
         </span>
         <a
           href="/admin"
@@ -29,7 +29,7 @@ export default function HomePage() {
               auto_awesome
             </span>
             <span className="font-label text-secondary uppercase tracking-[0.08em] text-xs">
-              Portal Central · protagonistarpg.com.br
+              Portal Central · fsalomone.web.app
             </span>
           </div>
 
@@ -74,7 +74,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-[#0A0A0C] w-full py-12 border-t border-purple-900/30 flex flex-col items-center gap-4">
         <p className="font-label text-xs uppercase tracking-widest text-on-primary-container">
-          © {new Date().getFullYear()} PROTAGONISTA RPG. TODOS OS DIREITOS RESERVADOS.
+          © {new Date().getFullYear()} PLATAFORMAS SALOMONE. TODOS OS DIREITOS RESERVADOS.
         </p>
       </footer>
     </main>

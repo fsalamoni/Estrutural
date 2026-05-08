@@ -1,7 +1,7 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
+import { Auth, getAuth } from 'firebase/auth';
+import { Firestore, getFirestore } from 'firebase/firestore';
+import { FirebaseStorage, getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,9 +12,31 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+export const isFirebaseConfigured = Object.values(firebaseConfig).every(
+  (value) => typeof value === 'string' && value.length > 0
+);
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export default app;
+function assertFirebaseConfigured(): void {
+  if (!isFirebaseConfigured) {
+    throw new Error('Firebase nao configurado no ambiente atual.');
+  }
+}
+
+export function getFirebaseApp(): FirebaseApp {
+  assertFirebaseConfigured();
+  return getApps().length ? getApp() : initializeApp(firebaseConfig);
+}
+
+export function getFirebaseAuth(): Auth {
+  return getAuth(getFirebaseApp());
+}
+
+export function getDb(): Firestore {
+  return getFirestore(getFirebaseApp());
+}
+
+export function getStorageService(): FirebaseStorage {
+  return getStorage(getFirebaseApp());
+}
+
+export default getFirebaseApp;

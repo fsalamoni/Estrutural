@@ -37,3 +37,6 @@ next-env.d.ts
 
 # cloudflare
 .wrangler/
+
+# firebase local artifacts
+.firebase/

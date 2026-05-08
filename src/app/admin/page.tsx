@@ -1,9 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAllPlatforms, useCategories } from '@/hooks/usePlatforms';
 import PlatformTable from '@/components/admin/PlatformTable';
+import AuthGuard from '@/components/admin/AuthGuard';
 import PlatformForm from '@/components/admin/PlatformForm';
 import SeedCatalogButton from '@/components/admin/SeedCatalogButton';
 import CategoryManager from '@/components/admin/CategoryManager';
@@ -25,19 +27,19 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>('platforms');
 
   async function handleSignOut() {
-    await fetch('/api/auth/session', { method: 'DELETE' });
     await signOut();
     window.location.href = '/';
   }
 
   return (
-    <div className="flex min-h-screen bg-surface-container-lowest">
-      {showForm && (
-        <PlatformForm
-          nextOrder={platforms.length}
-          onClose={() => setShowForm(false)}
-        />
-      )}
+    <AuthGuard>
+      <div className="flex min-h-screen bg-surface-container-lowest">
+        {showForm && (
+          <PlatformForm
+            nextOrder={platforms.length}
+            onClose={() => setShowForm(false)}
+          />
+        )}
 
       {/* Sidebar */}
       <aside className="h-screen w-64 fixed left-0 top-0 bg-[#0A0A0C] border-r border-purple-900/20 z-30 flex flex-col py-8">
@@ -51,30 +53,17 @@ export default function AdminPage() {
         </div>
 
         <nav className="flex-1 space-y-1 px-3">
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`w-full flex items-center gap-3 px-4 py-3 font-display text-sm transition-all ${
-                  isActive
-                    ? 'bg-secondary-container/20 text-secondary border-r-4 border-secondary font-medium'
-                    : 'text-on-primary-container hover:text-on-surface hover:bg-white/5 hover:translate-x-1'
-                }`}
-              >
-                <span className="material-symbols-outlined">{tab.icon}</span>
-                {tab.label}
-              </button>
-            );
-          })}
-          <a
+          <div className="flex items-center gap-3 px-4 py-3 bg-secondary-container/20 text-secondary border-r-4 border-secondary font-display text-sm font-medium">
+            <span className="material-symbols-outlined">dashboard</span>
+            Plataformas
+          </div>
+          <Link
             href="/"
             className="w-full flex items-center gap-3 px-4 py-3 text-on-primary-container hover:text-on-surface hover:bg-white/5 hover:translate-x-1 transition-all font-display text-sm"
           >
             <span className="material-symbols-outlined">language</span>
             Ver Portal
-          </a>
+          </Link>
         </nav>
 
         <div className="px-6 mt-auto pt-6 border-t border-white/5 space-y-3">
@@ -100,9 +89,7 @@ export default function AdminPage() {
               {activeTab === 'settings' && 'Configurações'}
             </h2>
             <p className="text-on-primary-container text-sm font-sans mt-1">
-              {activeTab === 'platforms' && 'Gerenciando as plataformas do PROTAGONISTA'}
-              {activeTab === 'categories' && 'Crie, edite e organize as listas de categorias.'}
-              {activeTab === 'settings' && 'Ajustes gerais do painel administrativo.'}
+              Gerenciando as plataformas do portal Salomone
             </p>
           </div>
 
@@ -210,6 +197,7 @@ export default function AdminPage() {
           <SettingsPanel platforms={platforms} categories={categories} />
         )}
       </main>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }
