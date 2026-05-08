@@ -14,12 +14,25 @@ const INSTRUCTIONS: Record<string, Step> = {
       'Clique em "Nova Plataforma" no topo do painel.',
       'Preencha o nome da plataforma (ex: Notion, Discord, GitHub).',
       'Adicione uma descrição breve para os usuários.',
+      'Selecione uma categoria já existente — ou crie uma na aba "Categorias".',
       'Insira a URL de acesso completa (https://...).',
       'Selecione o método de acesso: E-mail, Google, Ambos ou Acesso direto.',
       'Para o ícone: envie um arquivo (PNG/SVG) ou cole uma URL de imagem.',
       'Defina a ordem de exibição (0 = primeiro).',
       'Selecione "Ativo" para aparecer publicamente.',
       'Clique em "Criar Plataforma". Aparece no portal imediatamente.',
+    ],
+  },
+  categories: {
+    title: 'Como gerenciar categorias',
+    steps: [
+      'Acesse a aba "Categorias" na barra lateral do painel.',
+      'Clique em "Nova Categoria" para criar — informe nome, descrição, cor e ícone.',
+      'Use a pré-visualização para ver como o badge aparecerá no portal.',
+      'Para editar, clique no ícone de lápis no card da categoria.',
+      'A ordem das categorias define a ordem dos grupos exibidos no portal.',
+      'Para excluir, primeiro reatribua as plataformas — categorias em uso são protegidas.',
+      'Em "Configurações" há um diagnóstico de plataformas sem categoria.',
     ],
   },
   edit: {
@@ -77,6 +90,7 @@ const INSTRUCTIONS: Record<string, Step> = {
 
 const TOPICS = [
   { key: 'add', icon: 'add_circle', label: 'Adicionar' },
+  { key: 'categories', icon: 'category', label: 'Categorias' },
   { key: 'edit', icon: 'edit', label: 'Editar' },
   { key: 'hide', icon: 'visibility', label: 'Ocultar' },
   { key: 'order', icon: 'swap_vert', label: 'Ordenar' },
