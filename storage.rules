@@ -3,15 +3,28 @@ service firebase.storage {
   match /b/{bucket}/o {
     function isAdmin() {
       return request.auth != null
+             && request.auth.token.email is string
              && request.auth.token.email == "fsalamoni@gmail.com";
     }
 
-    match /platform-icons/{allPaths=**} {
+    function isValidIconPath(filePath) {
+      return filePath.matches('^[^/]+\\.(png|jpe?g|webp|svg|gif|avif|ico)$');
+    }
+
+    function isValidIconUpload(filePath) {
+      return request.resource != null
+             && isValidIconPath(filePath)
+             && request.resource.size <= 5 * 1024 * 1024
+             && request.resource.contentType is string
+             && request.resource.contentType.matches('image/(png|jpeg|webp|svg\\+xml|gif|avif|x-icon|vnd\\.microsoft\\.icon)');
+    }
+
+    match /platform-icons/{filePath=**} {
       // Ícones são públicos (necessário para exibir nas plataformas)
       allow read: if true;
 
-      // Somente o admin pode enviar e excluir ícones
-      allow write: if isAdmin();
+      allow create, update: if isAdmin() && isValidIconUpload(filePath);
+      allow delete: if isAdmin() && isValidIconPath(filePath);
     }
   }
 }

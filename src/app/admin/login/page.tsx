@@ -6,11 +6,31 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { isAdmin, signOut } from '@/lib/firebase/auth';
 
+const DEFAULT_REDIRECT = '/admin';
+
+function getSafeRedirectPath(redirect: string | null) {
+  if (!redirect?.trim() || !redirect.startsWith('/') || redirect.startsWith('//')) {
+    return DEFAULT_REDIRECT;
+  }
+
+  try {
+    const url = new URL(redirect, 'https://fsalomone.web.app');
+
+    if (url.origin !== 'https://fsalomone.web.app') {
+      return DEFAULT_REDIRECT;
+    }
+
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return DEFAULT_REDIRECT;
+  }
+}
+
 export default function AdminLoginPage() {
   const { user, isAdminUser, loading, signInWithEmail, signInWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') ?? '/admin';
+  const redirect = getSafeRedirectPath(searchParams.get('redirect'));
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

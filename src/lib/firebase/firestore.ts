@@ -14,7 +14,13 @@ import {
 } from 'firebase/firestore';
 import { getDb } from './config';
 import { deletePlatformIcon } from './storage';
-import { getPlatformCategory, Platform, PlatformInput } from '../types';
+import {
+  getPlatformCategory,
+  Platform,
+  PlatformInput,
+  sanitizePlatformInput,
+  sanitizePlatformPatch,
+} from '../types';
 
 const COLLECTION = 'platforms';
 
@@ -66,8 +72,10 @@ export function subscribeAllPlatforms(
 
 export async function createPlatform(data: PlatformInput): Promise<string> {
   const db = getDb();
+  const sanitizedData = sanitizePlatformInput(data);
+
   const ref = await addDoc(collection(db, COLLECTION), {
-    ...data,
+    ...sanitizedData,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -79,8 +87,10 @@ export async function updatePlatform(
   data: Partial<PlatformInput>
 ): Promise<void> {
   const db = getDb();
+  const sanitizedData = sanitizePlatformPatch(data);
+
   await updateDoc(doc(db, COLLECTION, id), {
-    ...data,
+    ...sanitizedData,
     updatedAt: serverTimestamp(),
   });
 }

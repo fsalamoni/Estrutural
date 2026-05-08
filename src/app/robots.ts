@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin', '/admin/', '/api/'],
+        disallow: ['/admin', '/admin/', '/admin/login', '/api/'],
       },
     ],
     sitemap: 'https://fsalomone.web.app/sitemap.xml',

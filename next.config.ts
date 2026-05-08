@@ -33,11 +33,15 @@ const missing = REQUIRED_ENV_VARS.filter(
 );
 
 if (missing.length > 0) {
-  // Warn but don't fail — allows `npm run build:next` locally without .env.local
-  console.warn(
+  const message =
     `\n⚠️  Variáveis de ambiente não configuradas:\n${missing.map((k) => `   • ${k}`).join('\n')}\n` +
-    `   Preencha .env.local antes de fazer deploy.\n`
-  );
+    `   Preencha .env.local antes de fazer deploy.\n`;
+
+  if (process.env.CI === 'true' || process.env.STRICT_ENV_VALIDATION === 'true') {
+    throw new Error(message);
+  }
+
+  console.warn(message);
 }
 
 const nextConfig: NextConfig = {

@@ -9,6 +9,13 @@ Portal central publicado em **https://fsalomone.web.app** para listar e direcion
 - **Firebase Auth + Firestore + Storage** para login admin, catálogo e ícones
 - **GitHub Actions** para deploy automático no `main`
 
+## Documentação de referência
+
+- [Arquitetura](docs/ARQUITETURA.md)
+- [Operações](docs/OPERACOES.md)
+- [Indexação e Cache](docs/INDEXACAO-CACHE.md)
+- [Verificação](docs/VERIFICACAO.md)
+
 ## Estado atual
 
 - Projeto Firebase: `hocapp-44760`

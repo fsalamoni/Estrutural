@@ -4,12 +4,21 @@ import { useState, useRef, FormEvent, useEffect } from 'react';
 import Image from 'next/image';
 import {
   DEFAULT_PLATFORM_CATEGORY,
+  MAX_PLATFORM_DESCRIPTION_LENGTH,
+  MAX_PLATFORM_NAME_LENGTH,
+  MAX_PLATFORM_URL_LENGTH,
   PLATFORM_CATEGORY_SUGGESTIONS,
   Platform,
   PlatformInput,
+  sanitizePlatformInput,
 } from '@/lib/types';
 import { createPlatform, updatePlatform } from '@/lib/firebase/firestore';
-import { uploadPlatformIcon, deletePlatformIcon, isFirebaseStorageUrl } from '@/lib/firebase/storage';
+import {
+  uploadPlatformIcon,
+  deletePlatformIcon,
+  isFirebaseStorageUrl,
+  validatePlatformIconFile,
+} from '@/lib/firebase/storage';
 import { toast } from '@/components/ui/Toast';
 
 interface Props {
@@ -59,10 +68,29 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [saving, onClose]);
 
+  useEffect(() => {
+    return () => {
+      if (iconPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(iconPreview);
+      }
+    };
+  }, [iconPreview]);
+
   function handleIconChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    try {
+      validatePlatformIconFile(file);
+    } catch (err) {
+      setIconFile(null);
+      setError(err instanceof Error ? err.message : 'Arquivo de ícone inválido.');
+      e.target.value = '';
+      return;
+    }
+
+    setError('');
     setIconFile(file);
+    setForm((current) => ({ ...current, iconUrl: '' }));
     setIconPreview(URL.createObjectURL(file));
   }
 
@@ -71,6 +99,10 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
     setSaving(true);
     setError('');
     try {
+      const sanitizedForm = sanitizePlatformInput({
+        ...form,
+        iconUrl: iconFile ? (isEditing ? platform?.iconUrl ?? '' : '') : form.iconUrl,
+      });
       let iconUrl = form.iconUrl;
       if (isEditing) {
         if (iconFile) {
@@ -82,14 +114,14 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
           }
           iconUrl = await uploadPlatformIcon(iconFile, platform!.id);
         }
-        await updatePlatform(platform!.id, { ...form, iconUrl });
+        await updatePlatform(platform!.id, { ...sanitizedForm, iconUrl });
       } else {
-        const newId = await createPlatform({ ...form, iconUrl: '' });
+        const newId = await createPlatform({ ...sanitizedForm, iconUrl: '' });
         if (iconFile) {
           iconUrl = await uploadPlatformIcon(iconFile, newId);
           await updatePlatform(newId, { iconUrl });
-        } else if (form.iconUrl) {
-          await updatePlatform(newId, { iconUrl: form.iconUrl });
+        } else if (sanitizedForm.iconUrl) {
+          await updatePlatform(newId, { iconUrl: sanitizedForm.iconUrl });
         }
       }
       toast(isEditing ? 'Plataforma atualizada com sucesso' : 'Plataforma criada com sucesso');
@@ -165,7 +197,9 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
                     type="url"
                     placeholder="Ou cole uma URL de imagem"
                     value={iconFile ? '' : form.iconUrl}
+                    maxLength={MAX_PLATFORM_URL_LENGTH}
                     onChange={(e) => {
+                      setError('');
                       setIconFile(null);
                       setIconPreview(e.target.value);
                       setForm((f) => ({ ...f, iconUrl: e.target.value }));
@@ -185,6 +219,7 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
                 required
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                maxLength={MAX_PLATFORM_NAME_LENGTH}
                 placeholder="Ex: Notion, Discord, GitHub..."
                 className="w-full bg-surface-container-lowest border-b border-outline-variant focus:border-tertiary text-on-surface py-3 px-0 placeholder:text-outline/50 focus:outline-none transition-colors"
               />
@@ -199,6 +234,7 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
                 rows={2}
                 value={form.description}
                 onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                maxLength={MAX_PLATFORM_DESCRIPTION_LENGTH}
                 placeholder="Descreva brevemente o que é essa plataforma..."
                 className="w-full resize-none bg-surface-container-lowest border-b border-outline-variant focus:border-tertiary text-on-surface py-3 px-0 placeholder:text-outline/50 focus:outline-none transition-colors"
               />
@@ -242,6 +278,7 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
                   required
                   type="url"
                   value={form.accessUrl}
+                  maxLength={MAX_PLATFORM_URL_LENGTH}
                   onChange={(e) => setForm((f) => ({ ...f, accessUrl: e.target.value }))}
                   placeholder="https://..."
                   className="flex-1 bg-transparent text-on-surface py-3 placeholder:text-outline/50 focus:outline-none"
