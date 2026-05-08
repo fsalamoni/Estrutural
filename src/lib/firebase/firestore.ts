@@ -11,15 +11,21 @@ import {
   serverTimestamp,
   Query,
   DocumentData,
+  getDocs,
 } from 'firebase/firestore';
 import { db } from './config';
 import { deletePlatformIcon } from './storage';
-import { Platform, PlatformInput } from '../types';
+import { Platform, PlatformInput, Category, CategoryInput } from '../types';
 
 const COLLECTION = 'platforms';
+const CATEGORIES_COLLECTION = 'categories';
 
 function docToPlatform(id: string, data: DocumentData): Platform {
   return { id, ...data } as Platform;
+}
+
+function docToCategory(id: string, data: DocumentData): Category {
+  return { id, ...data } as Category;
 }
 
 export function subscribePublicPlatforms(
@@ -88,4 +94,55 @@ export async function toggleVisibility(id: string, visible: boolean): Promise<vo
 
 export async function updateOrder(id: string, order: number): Promise<void> {
   await updateDoc(doc(db, COLLECTION, id), { order });
+}
+
+export function subscribeCategories(
+  callback: (categories: Category[]) => void,
+  onError?: (err: Error) => void
+): () => void {
+  const q = query(
+    collection(db, CATEGORIES_COLLECTION),
+    orderBy('order', 'asc')
+  ) as Query<DocumentData>;
+
+  return onSnapshot(
+    q,
+    (snap) => callback(snap.docs.map((d) => docToCategory(d.id, d.data()))),
+    (err) => onError?.(err)
+  );
+}
+
+export async function createCategory(data: CategoryInput): Promise<string> {
+  const ref = await addDoc(collection(db, CATEGORIES_COLLECTION), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updateCategory(
+  id: string,
+  data: Partial<CategoryInput>
+): Promise<void> {
+  await updateDoc(doc(db, CATEGORIES_COLLECTION, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+  const platformsUsingCategory = await getDocs(
+    query(collection(db, COLLECTION), where('categoryId', '==', id))
+  );
+  if (!platformsUsingCategory.empty) {
+    throw new Error(
+      `Esta categoria está em uso por ${platformsUsingCategory.size} plataforma(s). Reatribua-as antes de excluir.`
+    );
+  }
+  await deleteDoc(doc(db, CATEGORIES_COLLECTION, id));
+}
+
+export async function updateCategoryOrder(id: string, order: number): Promise<void> {
+  await updateDoc(doc(db, CATEGORIES_COLLECTION, id), { order });
 }

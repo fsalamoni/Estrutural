@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Platform, PlatformInput } from '@/lib/types';
 import { createPlatform, updatePlatform } from '@/lib/firebase/firestore';
 import { uploadPlatformIcon, deletePlatformIcon, isFirebaseStorageUrl } from '@/lib/firebase/storage';
+import { useCategories } from '@/hooks/usePlatforms';
 import { toast } from '@/components/ui/Toast';
 
 interface Props {
@@ -19,12 +20,14 @@ const EMPTY: PlatformInput = {
   accessUrl: '',
   iconUrl: '',
   authMethod: 'email',
+  categoryId: '',
   visible: true,
   order: 0,
 };
 
 export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
   const isEditing = !!platform;
+  const { categories, loading: loadingCategories } = useCategories();
   const [form, setForm] = useState<PlatformInput>(
     platform
       ? {
@@ -33,6 +36,7 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
           accessUrl: platform.accessUrl,
           iconUrl: platform.iconUrl,
           authMethod: platform.authMethod,
+          categoryId: platform.categoryId ?? '',
           visible: platform.visible,
           order: platform.order,
         }
@@ -195,6 +199,45 @@ export default function PlatformForm({ platform, nextOrder, onClose }: Props) {
                 placeholder="Descreva brevemente o que é essa plataforma..."
                 className="w-full resize-none bg-surface-container-lowest border-b border-outline-variant focus:border-tertiary text-on-surface py-3 px-0 placeholder:text-outline/50 focus:outline-none transition-colors"
               />
+            </div>
+          </section>
+
+          {/* Categoria */}
+          <section className="glass-panel rounded-xl p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-1 h-5 bg-secondary rounded-full" />
+                <h3 className="font-display text-xs font-semibold text-on-surface uppercase tracking-widest">
+                  Categoria
+                </h3>
+              </div>
+              {categories.length === 0 && !loadingCategories && (
+                <span className="text-[10px] font-label uppercase tracking-widest text-tertiary">
+                  Crie em &quot;Categorias&quot;
+                </span>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="font-label text-xs text-on-surface-variant uppercase tracking-widest">
+                Selecionar categoria
+              </label>
+              <select
+                value={form.categoryId}
+                onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
+                disabled={loadingCategories}
+                className="w-full bg-surface-container-lowest border-b border-outline-variant focus:border-secondary text-on-surface py-3 focus:outline-none transition-colors disabled:opacity-60"
+              >
+                <option value="">— Sem categoria —</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-on-primary-container font-sans">
+                Gerencie as categorias na aba <strong>Categorias</strong> do painel admin.
+              </p>
             </div>
           </section>
 

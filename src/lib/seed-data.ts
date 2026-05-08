@@ -1,19 +1,74 @@
 /**
- * Catálogo inicial das 11 plataformas do ecossistema Protagonista RPG.
+ * Catálogo inicial das plataformas e categorias do ecossistema Protagonista RPG.
  *
  * Importado pelo botão "Importar Catálogo" no painel admin para popular o
  * Firestore de uma vez. Idempotente — compara por `name` e só cria as que faltam.
  *
  * Plataformas com `visible: false` ficam no banco mas ocultas na landing
  * pública (apps cujo deploy ainda não está ativo).
+ *
+ * `categorySlug` é resolvido para `categoryId` no momento da importação.
  */
 
-import type { PlatformInput } from './types';
+import type { CategoryInput, PlatformInput } from './types';
 
 const FAVICON = (domain: string) =>
   `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
 
-export const PLATFORM_CATALOG: PlatformInput[] = [
+export const CATEGORY_CATALOG: (CategoryInput & { slug: string })[] = [
+  {
+    slug: 'rpg',
+    name: 'RPG & Mesa Virtual',
+    description: 'Plataformas para jogos de interpretação e mesas online.',
+    color: 'tertiary',
+    icon: 'casino',
+    order: 10,
+  },
+  {
+    slug: 'ia',
+    name: 'IA & Agentes',
+    description: 'Sistemas autônomos e ferramentas alimentadas por inteligência artificial.',
+    color: 'secondary',
+    icon: 'auto_awesome',
+    order: 20,
+  },
+  {
+    slug: 'juridico',
+    name: 'Jurídico',
+    description: 'Plataformas voltadas para o setor jurídico e Ministério Público.',
+    color: 'info',
+    icon: 'gavel',
+    order: 30,
+  },
+  {
+    slug: 'produtividade',
+    name: 'Produtividade',
+    description: 'Ferramentas de organização, anotações e gestão pessoal.',
+    color: 'success',
+    icon: 'workspaces',
+    order: 40,
+  },
+  {
+    slug: 'entretenimento',
+    name: 'Entretenimento',
+    description: 'Bolões, jogos e experiências interativas.',
+    color: 'warning',
+    icon: 'sports_esports',
+    order: 50,
+  },
+  {
+    slug: 'educacao',
+    name: 'Educação & Saúde',
+    description: 'Aprendizado, acompanhamento e bem-estar.',
+    color: 'success',
+    icon: 'school',
+    order: 60,
+  },
+];
+
+export const PLATFORM_CATALOG: (Omit<PlatformInput, 'categoryId'> & {
+  categorySlug?: string;
+})[] = [
   {
     name: 'OmniForge RPG',
     description:
@@ -23,6 +78,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'google',
     visible: true,
     order: 10,
+    categorySlug: 'rpg',
   },
   {
     name: 'Salomone IA',
@@ -33,6 +89,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'google',
     visible: true,
     order: 20,
+    categorySlug: 'ia',
   },
   {
     name: 'Lexio',
@@ -43,6 +100,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'google',
     visible: true,
     order: 30,
+    categorySlug: 'juridico',
   },
   {
     name: 'CAOCIPP',
@@ -53,6 +111,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'email',
     visible: true,
     order: 40,
+    categorySlug: 'juridico',
   },
   {
     name: 'Anotes',
@@ -63,6 +122,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'google',
     visible: true,
     order: 50,
+    categorySlug: 'produtividade',
   },
   {
     name: 'Superbolão',
@@ -73,6 +133,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'google',
     visible: true,
     order: 60,
+    categorySlug: 'entretenimento',
   },
   {
     name: 'Protagonista RPG',
@@ -83,6 +144,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'ambos',
     visible: false,
     order: 70,
+    categorySlug: 'rpg',
   },
   {
     name: 'OmniMesa',
@@ -93,6 +155,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'google',
     visible: false,
     order: 80,
+    categorySlug: 'rpg',
   },
   {
     name: 'OmniDice',
@@ -103,6 +166,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'nenhum',
     visible: false,
     order: 90,
+    categorySlug: 'rpg',
   },
   {
     name: 'Psico SaaS',
@@ -113,6 +177,7 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'email',
     visible: true,
     order: 100,
+    categorySlug: 'educacao',
   },
   {
     name: 'Laura',
@@ -123,5 +188,6 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     authMethod: 'nenhum',
     visible: true,
     order: 110,
+    categorySlug: 'educacao',
   },
 ];

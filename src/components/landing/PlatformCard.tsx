@@ -1,7 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { Platform, AUTH_METHOD_LABELS, AUTH_METHOD_COLORS } from '@/lib/types';
+import {
+  Platform,
+  Category,
+  AUTH_METHOD_LABELS,
+  AUTH_METHOD_COLORS,
+  getCategoryColorClass,
+} from '@/lib/types';
 
 const AUTH_METHOD_ICONS: Record<Platform['authMethod'], string> = {
   email: 'mail',
@@ -12,9 +18,10 @@ const AUTH_METHOD_ICONS: Record<Platform['authMethod'], string> = {
 
 interface Props {
   platform: Platform;
+  category?: Category;
 }
 
-export default function PlatformCard({ platform }: Props) {
+export default function PlatformCard({ platform, category }: Props) {
   return (
     <a
       href={platform.accessUrl}
@@ -49,6 +56,18 @@ export default function PlatformCard({ platform }: Props) {
           </span>
         )}
       </div>
+
+      {/* Category badge */}
+      {category && (
+        <span
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-label uppercase tracking-wider mb-3 ${getCategoryColorClass(category.color)}`}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>
+            {category.icon || 'category'}
+          </span>
+          {category.name}
+        </span>
+      )}
 
       {/* Name */}
       <h3 className="font-display font-semibold text-2xl leading-snug text-white mb-3 group-hover:text-secondary transition-colors">
