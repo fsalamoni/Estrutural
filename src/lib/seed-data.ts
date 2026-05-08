@@ -108,20 +108,20 @@ export const PLATFORM_CATALOG: PlatformInput[] = [
     name: 'Psico SaaS',
     description:
       'Acompanhamento psicológico — diário de humor, integração WhatsApp, painel da psicóloga, relatório clínico com IA.',
-    accessUrl: '',
-    iconUrl: FAVICON('protagonistarpg.com.br'),
+    accessUrl: 'https://fsalamoni.github.io/Psico-/',
+    iconUrl: FAVICON('fsalamoni.github.io'),
     authMethod: 'email',
-    visible: false,
+    visible: true,
     order: 100,
   },
   {
     name: 'Laura',
     description:
       'Jogo educacional sandbox 2D estilo Toca Boca — renderização de avatar SVG e mundo interativo.',
-    accessUrl: '',
-    iconUrl: FAVICON('protagonistarpg.com.br'),
+    accessUrl: 'https://fsalamoni.github.io/Laura/',
+    iconUrl: FAVICON('fsalamoni.github.io'),
     authMethod: 'nenhum',
-    visible: false,
+    visible: true,
     order: 110,
   },
 ];
