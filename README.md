@@ -154,6 +154,16 @@ npm run preview
 
 ---
 
+## Catálogo inicial das plataformas
+
+O painel admin tem um botão **"Importar Catálogo"** que adiciona de uma vez as 11 plataformas
+do ecossistema (OmniForge RPG, Salomone IA, Lexio, CAOCIPP, Anotes, Superbolão, etc).
+
+A lista é declarada em `src/lib/seed-data.ts`. O botão é idempotente — só cria as que ainda
+não existem no Firestore (compara por nome).
+
+---
+
 ## Deploy
 
 Deploy é **automático**: cada push para `main` dispara o GitHub Actions que:
