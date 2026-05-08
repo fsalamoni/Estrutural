@@ -23,18 +23,6 @@ const INSTRUCTIONS: Record<string, Step> = {
       'Clique em "Criar Plataforma". Aparece no portal imediatamente.',
     ],
   },
-  categories: {
-    title: 'Como gerenciar categorias',
-    steps: [
-      'Acesse a aba "Categorias" na barra lateral do painel.',
-      'Clique em "Nova Categoria" para criar — informe nome, descrição, cor e ícone.',
-      'Use a pré-visualização para ver como o badge aparecerá no portal.',
-      'Para editar, clique no ícone de lápis no card da categoria.',
-      'A ordem das categorias define a ordem dos grupos exibidos no portal.',
-      'Para excluir, primeiro reatribua as plataformas — categorias em uso são protegidas.',
-      'Em "Configurações" há um diagnóstico de plataformas sem categoria.',
-    ],
-  },
   edit: {
     title: 'Como editar uma plataforma',
     steps: [
@@ -90,7 +78,6 @@ const INSTRUCTIONS: Record<string, Step> = {
 
 const TOPICS = [
   { key: 'add', icon: 'add_circle', label: 'Adicionar' },
-  { key: 'categories', icon: 'category', label: 'Categorias' },
   { key: 'edit', icon: 'edit', label: 'Editar' },
   { key: 'hide', icon: 'visibility', label: 'Ocultar' },
   { key: 'order', icon: 'swap_vert', label: 'Ordenar' },

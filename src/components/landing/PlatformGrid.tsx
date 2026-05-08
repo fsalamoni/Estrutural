@@ -6,33 +6,6 @@ import PlatformCard from './PlatformCard';
 
 export default function PlatformGrid() {
   const { platforms, loading, error } = usePublicPlatforms();
-  const { categories } = useCategories();
-
-  const categoryById = useMemo(() => {
-    const map = new Map<string, Category>();
-    categories.forEach((c) => map.set(c.id, c));
-    return map;
-  }, [categories]);
-
-  const groups = useMemo(() => {
-    if (categories.length === 0) {
-      return [{ category: null as Category | null, items: platforms }];
-    }
-    const result: { category: Category | null; items: Platform[] }[] = categories
-      .map((c) => ({
-        category: c,
-        items: platforms.filter((p) => p.categoryId === c.id),
-      }))
-      .filter((g) => g.items.length > 0);
-
-    const uncategorized = platforms.filter(
-      (p) => !p.categoryId || !categoryById.has(p.categoryId)
-    );
-    if (uncategorized.length > 0) {
-      result.push({ category: null, items: uncategorized });
-    }
-    return result;
-  }, [platforms, categories, categoryById]);
 
   if (error) {
     return (
