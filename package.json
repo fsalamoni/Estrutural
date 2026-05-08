@@ -13,7 +13,9 @@
     "deploy": "npm run build && npx wrangler deploy",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "seed:platforms": "node scripts/seed-platforms.mjs",
+    "seed:platforms:dry": "node scripts/seed-platforms.mjs --dry-run"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.19.4",

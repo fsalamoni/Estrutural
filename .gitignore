@@ -37,3 +37,7 @@ next-env.d.ts
 
 # cloudflare
 .wrangler/
+
+# firebase service account (seed scripts)
+service-account.json
+service-account*.json

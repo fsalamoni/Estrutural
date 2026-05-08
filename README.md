@@ -154,6 +154,31 @@ npm run preview
 
 ---
 
+## Seed das plataformas
+
+A fonte de verdade declarativa das plataformas do hub fica em `scripts/platforms-data.ts`.
+Para popular o Firestore de uma vez (ou ressincronizar após edições no código):
+
+```bash
+# 1. Instalar dependências do seed (uma vez)
+npm install --save-dev firebase-admin tsx
+
+# 2. Baixar service account JSON do Firebase Console:
+#    Project Settings → Service accounts → Generate new private key
+#    Salvar como ./service-account.json (já está no .gitignore)
+
+# 3. Pré-visualizar (sem escrever)
+npm run seed:platforms:dry
+
+# 4. Aplicar (cria/atualiza por slug, idempotente)
+npm run seed:platforms
+```
+
+> Os documentos são identificados pelo campo `slug` — re-rodar não duplica entradas.
+> Plataformas com `visible: false` ficam no banco mas não aparecem na landing pública.
+
+---
+
 ## Deploy
 
 Deploy é **automático**: cada push para `main` dispara o GitHub Actions que:
