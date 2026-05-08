@@ -1,9 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAllPlatforms } from '@/hooks/usePlatforms';
 import PlatformTable from '@/components/admin/PlatformTable';
+import AuthGuard from '@/components/admin/AuthGuard';
 import PlatformForm from '@/components/admin/PlatformForm';
 
 export default function AdminPage() {
@@ -12,19 +14,19 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false);
 
   async function handleSignOut() {
-    await fetch('/api/auth/session', { method: 'DELETE' });
     await signOut();
     window.location.href = '/';
   }
 
   return (
-    <div className="flex min-h-screen bg-surface-container-lowest">
-      {showForm && (
-        <PlatformForm
-          nextOrder={platforms.length}
-          onClose={() => setShowForm(false)}
-        />
-      )}
+    <AuthGuard>
+      <div className="flex min-h-screen bg-surface-container-lowest">
+        {showForm && (
+          <PlatformForm
+            nextOrder={platforms.length}
+            onClose={() => setShowForm(false)}
+          />
+        )}
 
       {/* Sidebar */}
       <aside className="h-screen w-64 fixed left-0 top-0 bg-[#0A0A0C] border-r border-purple-900/20 z-30 flex flex-col py-8">
@@ -42,13 +44,13 @@ export default function AdminPage() {
             <span className="material-symbols-outlined">dashboard</span>
             Plataformas
           </div>
-          <a
+          <Link
             href="/"
             className="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:text-on-surface hover:bg-white/5 hover:translate-x-1 transition-all font-display text-sm"
           >
             <span className="material-symbols-outlined">language</span>
             Ver Portal
-          </a>
+          </Link>
         </nav>
 
         <div className="px-6 mt-auto pt-6 border-t border-white/5 space-y-3">
@@ -72,7 +74,7 @@ export default function AdminPage() {
               System Overview
             </h2>
             <p className="text-on-primary-container text-sm font-sans mt-1">
-              Gerenciando as plataformas do PROTAGONISTA
+              Gerenciando as plataformas do portal Salomone
             </p>
           </div>
           <button
@@ -159,6 +161,7 @@ export default function AdminPage() {
           <PlatformTable platforms={platforms} />
         )}
       </main>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }

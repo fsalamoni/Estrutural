@@ -1,6 +1,7 @@
 'use client';
 
 import { usePublicPlatforms } from '@/hooks/usePlatforms';
+import { comparePlatformCategories, getPlatformCategory, Platform } from '@/lib/types';
 import PlatformCard from './PlatformCard';
 
 export default function PlatformGrid() {
@@ -51,10 +52,38 @@ export default function PlatformGrid() {
     );
   }
 
+  const groupedPlatforms = Array.from(
+    platforms.reduce((sections, platform) => {
+      const category = getPlatformCategory(platform);
+      const categoryPlatforms = sections.get(category) ?? [];
+      categoryPlatforms.push(platform);
+      sections.set(category, categoryPlatforms);
+      return sections;
+    }, new Map<string, Platform[]>()).entries()
+  ).sort(([leftCategory], [rightCategory]) => comparePlatformCategories(leftCategory, rightCategory));
+
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {platforms.map((platform) => (
-        <PlatformCard key={platform.id} platform={platform} />
+    <div className="space-y-12">
+      {groupedPlatforms.map(([category, sectionPlatforms]) => (
+        <section key={category}>
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <p className="font-label text-[11px] uppercase tracking-[0.18em] text-on-primary-container">
+                Tipo de Plataforma
+              </p>
+              <h2 className="font-display text-2xl font-bold text-white mt-1">{category}</h2>
+            </div>
+            <span className="rounded-full border border-outline-variant bg-surface-container/70 px-3 py-1 text-[11px] font-label uppercase tracking-widest text-on-surface-variant">
+              {sectionPlatforms.length} {sectionPlatforms.length === 1 ? 'plataforma' : 'plataformas'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {sectionPlatforms.map((platform) => (
+              <PlatformCard key={platform.id} platform={platform} />
+            ))}
+          </div>
+        </section>
       ))}
     </div>
   );

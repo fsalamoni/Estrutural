@@ -1,20 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-
-async function createSession(uid: string) {
-  await fetch('/api/auth/session', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ uid }),
-  });
-}
-
-async function deleteSession() {
-  await fetch('/api/auth/session', { method: 'DELETE' });
-}
+import { isAdmin, signOut } from '@/lib/firebase/auth';
 
 export default function AdminLoginPage() {
   const { user, isAdminUser, loading, signInWithEmail, signInWithGoogle } = useAuth();
@@ -29,7 +19,7 @@ export default function AdminLoginPage() {
 
   useEffect(() => {
     if (!loading && user && isAdminUser) {
-      createSession(user.uid).then(() => router.replace(redirect));
+      router.replace(redirect);
     }
   }, [user, isAdminUser, loading, router, redirect]);
 
@@ -39,7 +29,11 @@ export default function AdminLoginPage() {
     setError('');
     try {
       const u = await signInWithEmail(email, password);
-      await createSession(u.uid);
+      if (!isAdmin(u)) {
+        setError('Esta conta nao tem permissao de administrador.');
+        await signOut();
+        return;
+      }
       router.replace(redirect);
     } catch {
       setError('E-mail ou senha inválidos. Verifique suas credenciais.');
@@ -53,13 +47,11 @@ export default function AdminLoginPage() {
     setError('');
     try {
       const u = await signInWithGoogle();
-      if (u.uid !== process.env.NEXT_PUBLIC_ADMIN_UID) {
+      if (!isAdmin(u)) {
         setError('Esta conta Google não tem permissão de administrador.');
-        await import('@/lib/firebase/auth').then((m) => m.signOut());
-        await deleteSession();
+        await signOut();
         return;
       }
-      await createSession(u.uid);
       router.replace(redirect);
     } catch {
       setError('Falha no login com Google. Tente novamente.');
@@ -85,7 +77,7 @@ export default function AdminLoginPage() {
       {/* Brand header */}
       <header className="fixed top-0 w-full z-50 flex justify-center items-center h-20">
         <div className="font-display font-black tracking-[0.2em] text-on-surface opacity-30 text-base uppercase">
-          PROTAGONISTA
+          SALOMONE
         </div>
       </header>
 
@@ -128,7 +120,7 @@ export default function AdminLoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="email@protagonistarpg.com.br"
+                  placeholder="fsalamoni@gmail.com"
                   autoComplete="email"
                   className="w-full bg-surface-container-lowest border border-outline-variant focus:border-secondary text-on-surface py-4 pl-12 pr-4 rounded-xl placeholder:text-outline/50 focus:outline-none transition-colors"
                 />
@@ -209,9 +201,9 @@ export default function AdminLoginPage() {
 
         <p className="mt-6 text-center text-xs text-on-primary-container">
           ←{' '}
-          <a href="/" className="hover:text-on-surface-variant transition-colors font-label">
+          <Link href="/" className="hover:text-on-surface-variant transition-colors font-label">
             Voltar para o portal
-          </a>
+          </Link>
         </p>
       </div>
 

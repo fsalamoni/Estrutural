@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase/config';
+import { getFirebaseAuth, isFirebaseConfigured } from '@/lib/firebase/config';
 import { isAdmin, signInWithEmail, signInWithGoogle, signOut } from '@/lib/firebase/auth';
 
 interface AuthContextType {
@@ -18,10 +18,14 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(isFirebaseConfigured);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    if (!isFirebaseConfigured) {
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (u) => {
       setUser(u);
       setLoading(false);
     });
@@ -33,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
-        isAdminUser: user ? isAdmin(user.uid) : false,
+        isAdminUser: isAdmin(user),
         signInWithEmail,
         signInWithGoogle,
         signOut,

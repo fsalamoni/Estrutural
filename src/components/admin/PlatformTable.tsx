@@ -2,7 +2,12 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Platform, AUTH_METHOD_LABELS, AUTH_METHOD_COLORS } from '@/lib/types';
+import {
+  AUTH_METHOD_COLORS,
+  AUTH_METHOD_LABELS,
+  getPlatformCategory,
+  Platform,
+} from '@/lib/types';
 import { deletePlatform, toggleVisibility, updateOrder } from '@/lib/firebase/firestore';
 import { toast } from '@/components/ui/Toast';
 import PlatformForm from './PlatformForm';
@@ -149,6 +154,11 @@ export default function PlatformTable({ platforms }: Props) {
                         {p.description}
                       </p>
                     )}
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span className="rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1 text-[10px] font-label font-bold uppercase text-on-surface-variant">
+                        {getPlatformCategory(p)}
+                      </span>
+                    </div>
                   </div>
                   <span
                     className={`px-2 py-1 text-[10px] font-label font-bold rounded-lg uppercase border flex-shrink-0 ml-2

@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export default function AdminError({
   error,
   reset,
@@ -23,12 +25,12 @@ export default function AdminError({
         >
           Tentar novamente
         </button>
-        <a
+        <Link
           href="/"
           className="rounded-xl border border-outline-variant px-5 py-2.5 text-xs font-display text-on-surface-variant hover:text-on-surface transition-colors uppercase tracking-widest"
         >
           Voltar ao site
-        </a>
+        </Link>
       </div>
     </div>
   );

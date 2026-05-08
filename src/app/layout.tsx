@@ -24,32 +24,32 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 });
 
-const BASE_URL = 'https://protagonistarpg.com.br';
+const BASE_URL = 'https://fsalomone.web.app';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'Protagonista RPG — Plataformas',
-    template: '%s | Protagonista RPG',
+    default: 'Plataformas Salomone',
+    template: '%s | Plataformas Salomone',
   },
-  description: 'Hub central de acesso às plataformas Protagonista RPG. Escolha a plataforma que deseja acessar.',
-  keywords: ['protagonista rpg', 'rpg', 'plataformas', 'acesso'],
-  authors: [{ name: 'Protagonista RPG' }],
-  creator: 'Protagonista RPG',
+  description: 'Hub central de acesso e direcionamento para as plataformas Salomone.',
+  keywords: ['salomone', 'plataformas', 'hub', 'acesso'],
+  authors: [{ name: 'Plataformas Salomone' }],
+  creator: 'Plataformas Salomone',
   icons: { icon: '/favicon.svg', shortcut: '/favicon.svg' },
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
     url: BASE_URL,
-    siteName: 'Protagonista RPG',
-    title: 'Protagonista RPG — Plataformas',
-    description: 'Hub central de acesso às plataformas Protagonista RPG.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Protagonista RPG — Plataformas' }],
+    siteName: 'Plataformas Salomone',
+    title: 'Plataformas Salomone',
+    description: 'Hub central de acesso e direcionamento para as plataformas Salomone.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Plataformas Salomone' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Protagonista RPG — Plataformas',
-    description: 'Hub central de acesso às plataformas Protagonista RPG.',
+    title: 'Plataformas Salomone',
+    description: 'Hub central de acesso e direcionamento para as plataformas Salomone.',
     images: ['/og-image.png'],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },

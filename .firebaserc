@@ -1,5 +1,14 @@
 {
   "projects": {
-    "default": "FIREBASE_PROJECT_ID_PLACEHOLDER"
+    "default": "hocapp-44760"
+  },
+  "targets": {
+    "hocapp-44760": {
+      "hosting": {
+        "site": [
+          "fsalomone"
+        ]
+      }
+    }
   }
 }

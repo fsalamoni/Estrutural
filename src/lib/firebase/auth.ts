@@ -5,24 +5,25 @@ import {
   signOut as firebaseSignOut,
   User,
 } from 'firebase/auth';
-import { auth } from './config';
+import { getFirebaseAuth } from './config';
 
 const googleProvider = new GoogleAuthProvider();
+const ADMIN_EMAIL = (process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? 'fsalamoni@gmail.com').toLowerCase();
 
 export async function signInWithEmail(email: string, password: string): Promise<User> {
-  const result = await signInWithEmailAndPassword(auth, email, password);
+  const result = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
   return result.user;
 }
 
 export async function signInWithGoogle(): Promise<User> {
-  const result = await signInWithPopup(auth, googleProvider);
+  const result = await signInWithPopup(getFirebaseAuth(), googleProvider);
   return result.user;
 }
 
 export async function signOut(): Promise<void> {
-  await firebaseSignOut(auth);
+  await firebaseSignOut(getFirebaseAuth());
 }
 
-export function isAdmin(uid: string): boolean {
-  return uid === process.env.NEXT_PUBLIC_ADMIN_UID;
+export function isAdmin(user: Pick<User, 'email'> | null): boolean {
+  return typeof user?.email === 'string' && user.email.toLowerCase() === ADMIN_EMAIL;
 }
