@@ -1,3 +1,4 @@
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import InstructionsPanel from '@/components/admin/InstructionsPanel';
 import { ToastContainer } from '@/components/ui/Toast';
 
@@ -9,8 +10,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <>
       {children}
-      <InstructionsPanel />
-      <ToastContainer />
+      <ErrorBoundary fallback={null}>
+        <InstructionsPanel />
+      </ErrorBoundary>
+      <ErrorBoundary fallback={null}>
+        <ToastContainer />
+      </ErrorBoundary>
     </>
   );
 }

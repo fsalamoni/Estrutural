@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export type ToastType = 'success' | 'error';
 
@@ -12,23 +12,49 @@ interface ToastMessage {
 
 let toastId = 0;
 let addToastFn: ((msg: string, type: ToastType) => void) | null = null;
+const pendingToasts: Array<{ message: string; type: ToastType }> = [];
 
 export function toast(message: string, type: ToastType = 'success') {
-  addToastFn?.(message, type);
+  if (addToastFn) {
+    addToastFn(message, type);
+    return;
+  }
+
+  pendingToasts.push({ message, type });
 }
 
 export function ToastContainer() {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const timeoutIdsRef = useRef<number[]>([]);
 
   useEffect(() => {
-    addToastFn = (message, type) => {
+    const enqueueToast = (message: string, type: ToastType) => {
       const id = ++toastId;
       setToasts((prev) => [...prev, { id, message, type }]);
-      setTimeout(() => {
+
+      const timeoutId = window.setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
       }, 3500);
+      timeoutIdsRef.current.push(timeoutId);
     };
-    return () => { addToastFn = null; };
+
+    addToastFn = enqueueToast;
+
+    while (pendingToasts.length > 0) {
+      const pendingToast = pendingToasts.shift();
+      if (pendingToast) {
+        enqueueToast(pendingToast.message, pendingToast.type);
+      }
+    }
+
+    return () => {
+      if (addToastFn === enqueueToast) {
+        addToastFn = null;
+      }
+
+      timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+      timeoutIdsRef.current = [];
+    };
   }, []);
 
   if (toasts.length === 0) return null;

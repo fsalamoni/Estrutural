@@ -27,7 +27,7 @@ function getSafeRedirectPath(redirect: string | null) {
 }
 
 export default function AdminLoginPage() {
-  const { user, isAdminUser, loading, signInWithEmail, signInWithGoogle } = useAuth();
+  const { user, isAdminUser, loading, configError, signInWithEmail, signInWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = getSafeRedirectPath(searchParams.get('redirect'));
@@ -45,6 +45,12 @@ export default function AdminLoginPage() {
 
   async function handleEmailLogin(e: FormEvent) {
     e.preventDefault();
+
+    if (configError) {
+      setError(configError);
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     try {
@@ -63,6 +69,11 @@ export default function AdminLoginPage() {
   }
 
   async function handleGoogleLogin() {
+    if (configError) {
+      setError(configError);
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     try {
@@ -176,9 +187,15 @@ export default function AdminLoginPage() {
               </p>
             )}
 
+            {configError && !error && (
+              <p role="alert" className="rounded-xl border border-error-container bg-error-container/20 px-4 py-3 text-sm text-error">
+                {configError}
+              </p>
+            )}
+
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || Boolean(configError)}
               className="w-full bg-secondary-container hover:bg-secondary-container/90 text-on-secondary-container font-display text-sm font-semibold py-4 rounded-xl transition-all flex items-center justify-center gap-3 group disabled:opacity-60 disabled:cursor-not-allowed uppercase tracking-wider"
             >
               <span>{isLoading ? 'Inicializando...' : 'Inicializar Sessão Segura'}</span>
@@ -196,7 +213,7 @@ export default function AdminLoginPage() {
           {/* Google */}
           <button
             onClick={handleGoogleLogin}
-            disabled={isLoading}
+            disabled={isLoading || Boolean(configError)}
             aria-label="Entrar com Google"
             className="w-full bg-surface-container-low hover:bg-surface-container-high border border-white/5 py-4 rounded-xl flex items-center justify-center gap-3 transition-colors text-on-surface disabled:opacity-60 disabled:cursor-not-allowed"
           >
