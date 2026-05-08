@@ -154,28 +154,13 @@ npm run preview
 
 ---
 
-## Seed das plataformas
+## Catálogo inicial das plataformas
 
-A fonte de verdade declarativa das plataformas do hub fica em `scripts/platforms-data.ts`.
-Para popular o Firestore de uma vez (ou ressincronizar após edições no código):
+O painel admin tem um botão **"Importar Catálogo"** que adiciona de uma vez as 11 plataformas
+do ecossistema (OmniForge RPG, Salomone IA, Lexio, CAOCIPP, Anotes, Superbolão, etc).
 
-```bash
-# 1. Instalar dependências do seed (uma vez)
-npm install --save-dev firebase-admin tsx
-
-# 2. Baixar service account JSON do Firebase Console:
-#    Project Settings → Service accounts → Generate new private key
-#    Salvar como ./service-account.json (já está no .gitignore)
-
-# 3. Pré-visualizar (sem escrever)
-npm run seed:platforms:dry
-
-# 4. Aplicar (cria/atualiza por slug, idempotente)
-npm run seed:platforms
-```
-
-> Os documentos são identificados pelo campo `slug` — re-rodar não duplica entradas.
-> Plataformas com `visible: false` ficam no banco mas não aparecem na landing pública.
+A lista é declarada em `src/lib/seed-data.ts`. O botão é idempotente — só cria as que ainda
+não existem no Firestore (compara por nome).
 
 ---
 

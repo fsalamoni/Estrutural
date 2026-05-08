@@ -1,41 +1,20 @@
 /**
- * Dados-fonte (declarativos) das plataformas do hub Protagonista RPG.
+ * Catálogo inicial das 11 plataformas do ecossistema Protagonista RPG.
  *
- * Este arquivo é a fonte de verdade git-trackeada. Use com `seed-platforms.mjs`
- * para popular o Firestore. Edições subsequentes podem ser feitas pelo painel admin.
+ * Importado pelo botão "Importar Catálogo" no painel admin para popular o
+ * Firestore de uma vez. Idempotente — compara por `name` e só cria as que faltam.
  *
- * Plataformas com `visible: false` ficam no banco mas não aparecem na landing
- * pública — útil para apps cujo deploy ainda não está ativo.
+ * Plataformas com `visible: false` ficam no banco mas ocultas na landing
+ * pública (apps cujo deploy ainda não está ativo).
  */
 
-export type PlatformSeed = {
-  slug: string;
-  name: string;
-  description: string;
-  accessUrl: string;
-  iconUrl: string;
-  authMethod: 'email' | 'google' | 'ambos' | 'nenhum';
-  visible: boolean;
-  order: number;
-};
+import type { PlatformInput } from './types';
 
 const FAVICON = (domain: string) =>
   `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
 
-export const PLATFORMS: PlatformSeed[] = [
+export const PLATFORM_CATALOG: PlatformInput[] = [
   {
-    slug: 'protagonista-rpg',
-    name: 'Protagonista RPG',
-    description:
-      'Plataforma RPG completa: ficha de personagem, dice box 3D, mesa virtual via WebRTC e narrativa assistida por IA.',
-    accessUrl: 'https://app.protagonistarpg.com.br',
-    iconUrl: FAVICON('protagonistarpg.com.br'),
-    authMethod: 'ambos',
-    visible: false,
-    order: 10,
-  },
-  {
-    slug: 'omniforge',
     name: 'OmniForge RPG',
     description:
       'Gerador de campanhas de RPG com IA — sessões, NPCs, encontros e narrativa coesa por agentes especializados.',
@@ -43,43 +22,19 @@ export const PLATFORMS: PlatformSeed[] = [
     iconUrl: FAVICON('protagonistarpg.com.br'),
     authMethod: 'google',
     visible: true,
-    order: 20,
+    order: 10,
   },
   {
-    slug: 'omnimesa',
-    name: 'OmniMesa',
-    description:
-      'VTT (Virtual Tabletop) completo com mapas, tokens, sistemas D&D 5e e chat com IA Gemini.',
-    accessUrl: '',
-    iconUrl: FAVICON('protagonistarpg.com.br'),
-    authMethod: 'google',
-    visible: false,
-    order: 30,
-  },
-  {
-    slug: 'omnidice',
-    name: 'OmniDice',
-    description:
-      'Dice roller 3D profissional baseado em física — Rapier3D + Three.js, com suporte a streaming OBS.',
-    accessUrl: '',
-    iconUrl: FAVICON('protagonistarpg.com.br'),
-    authMethod: 'nenhum',
-    visible: false,
-    order: 40,
-  },
-  {
-    slug: 'salomone-ia',
     name: 'Salomone IA',
     description:
-      'Plataforma de agentes autônomos — loop ReAct, 10 ferramentas, multi-LLM (OpenRouter, Gemini, Groq, DeepSeek).',
+      'Plataforma de agentes autônomos — loop ReAct, multi-LLM (OpenRouter, Gemini, Groq, DeepSeek), 10 ferramentas integradas.',
     accessUrl: 'https://salomone.web.app',
     iconUrl: FAVICON('salomone.web.app'),
     authMethod: 'google',
     visible: true,
-    order: 50,
+    order: 20,
   },
   {
-    slug: 'lexio',
     name: 'Lexio',
     description:
       'SaaS de produção jurídica com IA — pipelines multi-agente, jurisprudência DataJud/CNJ, teses, pareceres e caderno de pesquisa.',
@@ -87,10 +42,9 @@ export const PLATFORMS: PlatformSeed[] = [
     iconUrl: FAVICON('lexio.web.app'),
     authMethod: 'google',
     visible: true,
-    order: 60,
+    order: 30,
   },
   {
-    slug: 'caocipp',
     name: 'CAOCIPP',
     description:
       'Sistema de gestão do Centro de Apoio Operacional do MP-RS — consultas jurídicas e expedientes administrativos.',
@@ -98,21 +52,19 @@ export const PLATFORMS: PlatformSeed[] = [
     iconUrl: FAVICON('consultascao.web.app'),
     authMethod: 'email',
     visible: true,
-    order: 70,
+    order: 40,
   },
   {
-    slug: 'gravador',
-    name: 'Anotes (Gravador)',
+    name: 'Anotes',
     description:
-      'Gravador de áudio com IA — transcrição, resumos, mapas mentais, web + mobile sincronizados.',
+      'Gravador de áudio com IA — transcrição, resumos, mapas mentais. Web e mobile sincronizados.',
     accessUrl: 'https://anotes.web.app',
     iconUrl: FAVICON('anotes.web.app'),
     authMethod: 'google',
     visible: true,
-    order: 80,
+    order: 50,
   },
   {
-    slug: 'superbolao',
     name: 'Superbolão',
     description:
       'Bolões privados da Copa do Mundo FIFA 2026 — palpites por jogo, ranking ao vivo, apuração automática.',
@@ -120,10 +72,39 @@ export const PLATFORMS: PlatformSeed[] = [
     iconUrl: FAVICON('superbolao.web.app'),
     authMethod: 'google',
     visible: true,
+    order: 60,
+  },
+  {
+    name: 'Protagonista RPG',
+    description:
+      'Plataforma RPG completa: ficha de personagem, dice box 3D, mesa virtual via WebRTC e narrativa assistida por IA.',
+    accessUrl: 'https://app.protagonistarpg.com.br',
+    iconUrl: FAVICON('protagonistarpg.com.br'),
+    authMethod: 'ambos',
+    visible: false,
+    order: 70,
+  },
+  {
+    name: 'OmniMesa',
+    description:
+      'VTT (Virtual Tabletop) completo com mapas, tokens, sistemas D&D 5e e chat com IA Gemini.',
+    accessUrl: '',
+    iconUrl: FAVICON('protagonistarpg.com.br'),
+    authMethod: 'google',
+    visible: false,
+    order: 80,
+  },
+  {
+    name: 'OmniDice',
+    description:
+      'Dice roller 3D profissional baseado em física — Rapier3D + Three.js, com suporte a streaming OBS.',
+    accessUrl: '',
+    iconUrl: FAVICON('protagonistarpg.com.br'),
+    authMethod: 'nenhum',
+    visible: false,
     order: 90,
   },
   {
-    slug: 'psico',
     name: 'Psico SaaS',
     description:
       'Acompanhamento psicológico — diário de humor, integração WhatsApp, painel da psicóloga, relatório clínico com IA.',
@@ -134,7 +115,6 @@ export const PLATFORMS: PlatformSeed[] = [
     order: 100,
   },
   {
-    slug: 'laura',
     name: 'Laura',
     description:
       'Jogo educacional sandbox 2D estilo Toca Boca — renderização de avatar SVG e mundo interativo.',

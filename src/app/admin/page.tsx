@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAllPlatforms } from '@/hooks/usePlatforms';
 import PlatformTable from '@/components/admin/PlatformTable';
 import PlatformForm from '@/components/admin/PlatformForm';
+import SeedCatalogButton from '@/components/admin/SeedCatalogButton';
 
 export default function AdminPage() {
   const { user, signOut } = useAuth();
@@ -75,13 +76,16 @@ export default function AdminPage() {
               Gerenciando as plataformas do PROTAGONISTA
             </p>
           </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 bg-secondary text-on-secondary px-6 py-3 rounded-xl font-display text-sm font-semibold hover:shadow-[0_0_20px_rgba(208,188,255,0.4)] transition-all whitespace-nowrap"
-          >
-            <span className="material-symbols-outlined">add</span>
-            Nova Plataforma
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <SeedCatalogButton existing={platforms} />
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 bg-secondary text-on-secondary px-6 py-3 rounded-xl font-display text-sm font-semibold hover:shadow-[0_0_20px_rgba(208,188,255,0.4)] transition-all whitespace-nowrap"
+            >
+              <span className="material-symbols-outlined">add</span>
+              Nova Plataforma
+            </button>
+          </div>
         </header>
 
         {/* Bento stats grid */}
