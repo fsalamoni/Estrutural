@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { Platform } from '@/lib/types';
-import { createPlatform } from '@/lib/firebase/firestore';
-import { PLATFORM_CATALOG } from '@/lib/seed-data';
+import { createPlatform, createCategory } from '@/lib/firebase/firestore';
+import { PLATFORM_CATALOG, CATEGORY_CATALOG } from '@/lib/seed-data';
+import { useCategories } from '@/hooks/usePlatforms';
 import { toast } from '@/components/ui/Toast';
 
 interface Props {
@@ -13,15 +14,25 @@ interface Props {
 type Status = 'idle' | 'preview' | 'importing' | 'done';
 
 export default function SeedCatalogButton({ existing }: Props) {
+  const { categories } = useCategories();
   const [status, setStatus] = useState<Status>('idle');
   const [progress, setProgress] = useState(0);
 
   const existingNames = new Set(existing.map((p) => p.name.trim().toLowerCase()));
-  const missing = PLATFORM_CATALOG.filter(
+  const missingPlatforms = PLATFORM_CATALOG.filter(
     (p) => !existingNames.has(p.name.trim().toLowerCase())
   );
 
-  if (missing.length === 0 && status !== 'done') {
+  const existingCategoryNames = new Set(
+    categories.map((c) => c.name.trim().toLowerCase())
+  );
+  const missingCategories = CATEGORY_CATALOG.filter(
+    (c) => !existingCategoryNames.has(c.name.trim().toLowerCase())
+  );
+
+  const totalToImport = missingPlatforms.length + missingCategories.length;
+
+  if (totalToImport === 0 && status !== 'done') {
     return null;
   }
 
@@ -30,20 +41,47 @@ export default function SeedCatalogButton({ existing }: Props) {
     setProgress(0);
     let imported = 0;
     let failed = 0;
-    for (const p of missing) {
+
+    // Build slug -> id map: existing categories first, then newly created.
+    const slugToId = new Map<string, string>();
+    for (const c of categories) {
+      const matchingSeed = CATEGORY_CATALOG.find(
+        (s) => s.name.trim().toLowerCase() === c.name.trim().toLowerCase()
+      );
+      if (matchingSeed) slugToId.set(matchingSeed.slug, c.id);
+    }
+
+    // Create missing categories first.
+    for (const c of missingCategories) {
       try {
-        await createPlatform(p);
+        const { slug, ...rest } = c;
+        const id = await createCategory(rest);
+        slugToId.set(slug, id);
         imported++;
       } catch {
         failed++;
       }
       setProgress(imported + failed);
     }
+
+    // Create missing platforms with resolved categoryId.
+    for (const p of missingPlatforms) {
+      try {
+        const { categorySlug, ...rest } = p;
+        const categoryId = categorySlug ? slugToId.get(categorySlug) ?? '' : '';
+        await createPlatform({ ...rest, categoryId });
+        imported++;
+      } catch {
+        failed++;
+      }
+      setProgress(imported + failed);
+    }
+
     setStatus('done');
     if (failed === 0) {
-      toast(`${imported} plataformas importadas com sucesso.`);
+      toast(`${imported} item(ns) importado(s) com sucesso.`);
     } else {
-      toast(`${imported} importadas, ${failed} falharam. Verifique as regras do Firestore.`, 'error');
+      toast(`${imported} importado(s), ${failed} falharam. Verifique as regras do Firestore.`, 'error');
     }
   }
 
@@ -54,7 +92,7 @@ export default function SeedCatalogButton({ existing }: Props) {
         className="flex items-center gap-2 rounded-xl border border-tertiary/40 bg-tertiary/10 px-5 py-3 font-display text-sm font-semibold text-tertiary transition-all hover:bg-tertiary/20 hover:shadow-[0_0_15px_rgba(255,193,7,0.25)] whitespace-nowrap"
       >
         <span className="material-symbols-outlined">inventory_2</span>
-        Importar Catálogo ({missing.length})
+        Importar Catálogo ({totalToImport})
       </button>
 
       {status === 'preview' && (
@@ -87,47 +125,82 @@ export default function SeedCatalogButton({ existing }: Props) {
             </div>
 
             <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-              <p className="text-sm text-on-surface-variant">
-                As <strong className="text-on-surface">{missing.length}</strong> plataformas abaixo
-                serão criadas no Firestore. As que já existem (mesmo nome) são ignoradas.
-              </p>
-
-              <ul className="space-y-2">
-                {missing.map((p) => (
-                  <li
-                    key={p.name}
-                    className="flex items-start gap-3 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3"
-                  >
-                    <span
-                      className={`material-symbols-outlined text-lg mt-0.5 ${
-                        p.visible ? 'text-secondary' : 'text-on-primary-container'
-                      }`}
-                    >
-                      {p.visible ? 'visibility' : 'visibility_off'}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-display text-sm font-semibold text-on-surface">
-                          {p.name}
+              {missingCategories.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-label uppercase tracking-widest text-tertiary">
+                    Categorias ({missingCategories.length})
+                  </p>
+                  <ul className="space-y-2">
+                    {missingCategories.map((c) => (
+                      <li
+                        key={c.slug}
+                        className="flex items-start gap-3 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3"
+                      >
+                        <span className="material-symbols-outlined text-lg mt-0.5 text-tertiary">
+                          {c.icon}
                         </span>
-                        {!p.visible && (
-                          <span className="text-[10px] font-label uppercase tracking-widest text-on-primary-container border border-outline-variant rounded px-1.5 py-0.5">
-                            oculto
+                        <div className="flex-1 min-w-0">
+                          <span className="font-display text-sm font-semibold text-on-surface">
+                            {c.name}
                           </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-on-surface-variant mt-0.5 line-clamp-2">
-                        {p.description}
-                      </p>
-                      {p.accessUrl && (
-                        <p className="text-[11px] text-on-primary-container mt-1 font-mono truncate">
-                          {p.accessUrl}
-                        </p>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                          <p className="text-xs text-on-surface-variant mt-0.5 line-clamp-2">
+                            {c.description}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {missingPlatforms.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-label uppercase tracking-widest text-secondary">
+                    Plataformas ({missingPlatforms.length})
+                  </p>
+                  <ul className="space-y-2">
+                    {missingPlatforms.map((p) => (
+                      <li
+                        key={p.name}
+                        className="flex items-start gap-3 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3"
+                      >
+                        <span
+                          className={`material-symbols-outlined text-lg mt-0.5 ${
+                            p.visible ? 'text-secondary' : 'text-on-primary-container'
+                          }`}
+                        >
+                          {p.visible ? 'visibility' : 'visibility_off'}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-display text-sm font-semibold text-on-surface">
+                              {p.name}
+                            </span>
+                            {!p.visible && (
+                              <span className="text-[10px] font-label uppercase tracking-widest text-on-primary-container border border-outline-variant rounded px-1.5 py-0.5">
+                                oculto
+                              </span>
+                            )}
+                            {p.categorySlug && (
+                              <span className="text-[10px] font-label uppercase tracking-widest text-tertiary border border-tertiary/40 rounded px-1.5 py-0.5">
+                                {p.categorySlug}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-on-surface-variant mt-0.5 line-clamp-2">
+                            {p.description}
+                          </p>
+                          {p.accessUrl && (
+                            <p className="text-[11px] text-on-primary-container mt-1 font-mono truncate">
+                              {p.accessUrl}
+                            </p>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 border-t border-outline-variant px-6 py-4">
@@ -141,7 +214,7 @@ export default function SeedCatalogButton({ existing }: Props) {
                 onClick={handleImport}
                 className="flex-1 rounded-xl bg-tertiary text-on-tertiary py-3 text-xs font-display font-semibold hover:shadow-[0_0_15px_rgba(255,193,7,0.4)] transition-all uppercase tracking-widest"
               >
-                Importar {missing.length}
+                Importar {totalToImport}
               </button>
             </div>
           </div>
@@ -153,10 +226,10 @@ export default function SeedCatalogButton({ existing }: Props) {
           <div className="glass-panel rounded-xl border border-outline-variant p-8 max-w-sm w-full text-center space-y-4">
             <div className="h-10 w-10 mx-auto animate-spin rounded-full border-2 border-outline-variant border-t-tertiary" />
             <p className="font-display text-sm text-on-surface">
-              Importando plataformas...
+              Importando catálogo...
             </p>
             <p className="text-xs text-on-surface-variant font-mono">
-              {progress} / {missing.length}
+              {progress} / {totalToImport}
             </p>
           </div>
         </div>

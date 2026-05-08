@@ -11,5 +11,14 @@ service cloud.firestore {
       allow write: if request.auth != null
                    && request.auth.uid == "ADMIN_UID_PLACEHOLDER";
     }
+
+    match /categories/{categoryId} {
+      // Categorias são públicas (necessárias para agrupar plataformas no portal)
+      allow read: if true;
+
+      // Somente o admin pode criar, editar e excluir
+      allow write: if request.auth != null
+                   && request.auth.uid == "ADMIN_UID_PLACEHOLDER";
+    }
   }
 }
