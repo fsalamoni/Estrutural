@@ -9,16 +9,14 @@
     "dev": "next dev",
     "build": "next build",
     "build:next": "next build",
-    "build:cloudflare": "npx @opennextjs/cloudflare build",
     "preview": "firebase emulators:start --only hosting",
-    "preview:cloudflare": "npx wrangler dev",
     "deploy": "npm run build && npx firebase-tools deploy --project hocapp-44760 --only hosting,firestore:rules,storage",
     "start": "firebase emulators:start --only hosting",
     "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.19.4",
+    "@fontsource/material-symbols-outlined": "^5.2.43",
     "autoprefixer": "^10.5.0",
     "firebase": "^11.6.0",
     "next": "^16.2.4",
@@ -26,7 +24,6 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241205.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -35,7 +32,6 @@
     "firebase-tools": "^14.22.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "wrangler": "^4.0.0"
+    "typescript": "^5"
   }
 }

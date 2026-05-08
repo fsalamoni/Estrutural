@@ -98,4 +98,4 @@ npm run dev
 
 ## Observação operacional
 
-O repositório ainda mantém arquivos antigos de Cloudflare (`wrangler.toml` e `open-next.config.ts`), mas o caminho ativo de publicação agora é Firebase Hosting.
+O fluxo ativo de build e publicação deste projeto é exclusivamente via Firebase Hosting.
