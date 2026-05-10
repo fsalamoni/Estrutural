@@ -5,7 +5,7 @@ import { comparePlatformCategories, getPlatformCategory, Platform } from '@/lib/
 import PlatformCard from './PlatformCard';
 
 export default function PlatformGrid() {
-  const { platforms, loading, error } = usePublicPlatforms();
+  const { platforms, loading, error, warning } = usePublicPlatforms();
 
   if (error) {
     return (
@@ -64,6 +64,12 @@ export default function PlatformGrid() {
 
   return (
     <div className="space-y-12">
+      {warning && (
+        <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 px-4 py-3 text-sm text-on-surface-variant">
+          {warning}
+        </div>
+      )}
+
       {groupedPlatforms.map(([category, sectionPlatforms]) => (
         <section key={category}>
           <div className="mb-5 flex items-center justify-between gap-4">

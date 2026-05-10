@@ -5,6 +5,7 @@ import { FormEvent, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { isAdmin, signOut } from '@/lib/firebase/auth';
+import { SITE_ORIGIN, SITE_URL } from '@/lib/site';
 
 const DEFAULT_REDIRECT = '/admin';
 
@@ -14,9 +15,9 @@ function getSafeRedirectPath(redirect: string | null) {
   }
 
   try {
-    const url = new URL(redirect, 'https://fsalomone.web.app');
+    const url = new URL(redirect, SITE_URL);
 
-    if (url.origin !== 'https://fsalomone.web.app') {
+    if (url.origin !== SITE_ORIGIN) {
       return DEFAULT_REDIRECT;
     }
 

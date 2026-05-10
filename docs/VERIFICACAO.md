@@ -5,6 +5,7 @@
 ```bash
 npm run type-check
 npm run lint
+npm test
 npm run build
 ```
 
@@ -33,6 +34,9 @@ npm run build
 2. Deploy inclui hosting, rules, indexes e storage.
 3. `robots.txt` e `sitemap.xml` respondem corretamente.
 4. Headers de cache e seguranca estao presentes na resposta do Hosting.
+5. A homepage publica responde `200`, nao exibe o estado de erro do catalogo e contem cards-chave como `Lexio` e `OmniDice`.
+
+Para staging, o item 2 fica temporariamente reduzido a Hosting + Firestore enquanto o bucket padrao de Storage nao existir. A validacao de login admin em staging tambem fica pendente enquanto o projeto continuar sem configuracao de Firebase Auth.
 
 ## Evidencias de encerramento
 

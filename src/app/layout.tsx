@@ -3,6 +3,7 @@ import { Epilogue, Manrope, Space_Grotesk } from 'next/font/google';
 import '@fontsource/material-symbols-outlined';
 import './globals.css';
 import { AuthProvider } from '@/hooks/useAuth';
+import { SITE_URL } from '@/lib/site';
 
 const epilogue = Epilogue({
   subsets: ['latin'],
@@ -25,10 +26,8 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 });
 
-const BASE_URL = 'https://fsalomone.web.app';
-
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Plataformas Salomone',
     template: '%s | Plataformas Salomone',
@@ -41,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    url: BASE_URL,
+    url: SITE_URL,
     siteName: 'Plataformas Salomone',
     title: 'Plataformas Salomone',
     description: 'Hub central de acesso e direcionamento para as plataformas Salomone.',

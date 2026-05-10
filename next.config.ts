@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
-const firebaseEnv = {
+const publicEnv = {
+  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fsalomone.web.app',
   NEXT_PUBLIC_FIREBASE_API_KEY:
     process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? process.env.VITE_FIREBASE_API_KEY,
   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:
@@ -13,6 +14,7 @@ const firebaseEnv = {
     process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   NEXT_PUBLIC_FIREBASE_APP_ID:
     process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? process.env.VITE_FIREBASE_APP_ID,
+  NEXT_PUBLIC_ADMIN_EMAIL: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
 };
 
 // Validate required environment variables at build time
@@ -23,11 +25,12 @@ const REQUIRED_ENV_VARS = [
   'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
   'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
   'NEXT_PUBLIC_FIREBASE_APP_ID',
+  'NEXT_PUBLIC_ADMIN_EMAIL',
 ] as const;
 
 const missing = REQUIRED_ENV_VARS.filter(
   (key) => {
-    const value = firebaseEnv[key];
+    const value = publicEnv[key];
     return !value || value.includes('placeholder') || value.includes('your-');
   }
 );
@@ -47,7 +50,7 @@ if (missing.length > 0) {
 const nextConfig: NextConfig = {
   output: 'export',
   trailingSlash: true,
-  env: firebaseEnv,
+  env: publicEnv,
   images: {
     unoptimized: true,
     remotePatterns: [

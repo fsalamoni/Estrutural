@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "fsalomone",
+    "target": "site",
     "public": "out",
     "ignore": [
       "firebase.json",
@@ -8,6 +8,24 @@
       "**/node_modules/**"
     ],
     "headers": [
+      {
+        "source": "/robots.txt",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store, max-age=0"
+          }
+        ]
+      },
+      {
+        "source": "/sitemap.xml",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store, max-age=0"
+          }
+        ]
+      },
       {
         "source": "**/*.html",
         "headers": [
@@ -47,7 +65,7 @@
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; connect-src 'self' https://apis.google.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://*.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://*.firebaseio.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; frame-src https://accounts.google.com https://apis.google.com https://hocapp-44760.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'"
+            "value": "default-src 'self'; connect-src 'self' https://apis.google.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://*.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://*.firebaseio.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; frame-src https://accounts.google.com https://apis.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'"
           }
         ]
       }

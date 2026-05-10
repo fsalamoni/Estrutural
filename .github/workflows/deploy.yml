@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   check:
-    name: Type Check & Lint
+    name: Type Check, Lint & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +30,9 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Test
+        run: npm test
 
   deploy:
     name: Build & Deploy
@@ -58,11 +61,12 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_ADMIN_EMAIL: ${{ secrets['NEXT_PUBLIC_ADMIN_EMAIL'] }}
         run: |
           missing=0
-          for var in FIREBASE_SERVICE_ACCOUNT VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_PROJECT_ID VITE_FIREBASE_STORAGE_BUCKET VITE_FIREBASE_MESSAGING_SENDER_ID VITE_FIREBASE_APP_ID; do
+          for var in FIREBASE_SERVICE_ACCOUNT VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_PROJECT_ID VITE_FIREBASE_STORAGE_BUCKET VITE_FIREBASE_MESSAGING_SENDER_ID VITE_FIREBASE_APP_ID NEXT_PUBLIC_ADMIN_EMAIL; do
             if [ -z "${!var}" ]; then
-              echo "::error title=Missing secret::$var não está configurado"
+              echo "::error title=Missing configuration::$var não está configurado"
               missing=1
             fi
           done
@@ -81,7 +85,7 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          NEXT_PUBLIC_ADMIN_EMAIL: fsalamoni@gmail.com
+          NEXT_PUBLIC_ADMIN_EMAIL: ${{ secrets['NEXT_PUBLIC_ADMIN_EMAIL'] }}
 
       - name: Write Firebase service account
         run: |
@@ -91,3 +95,6 @@ jobs:
         run: npx firebase-tools deploy --project hocapp-44760 --only hosting,firestore:rules,firestore:indexes,storage --non-interactive
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
+
+      - name: Smoke test production homepage
+        run: node scripts/smoke-public-homepage.mjs https://fsalomone.web.app/

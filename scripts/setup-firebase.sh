@@ -1,86 +1,101 @@
 #!/usr/bin/env bash
 # =============================================================================
 # setup-firebase.sh
-# Configura o projeto Firebase após você preencher .env.local e .firebaserc
-# Execute: bash scripts/setup-firebase.sh
+# Configure the Firebase project after .env.local and .firebaserc are ready.
+# Run with: bash scripts/setup-firebase.sh
 # =============================================================================
 
-set -e
+set -euo pipefail
 
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
-info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
-success() { echo -e "${GREEN}[OK]${NC} $1"; }
-warn()    { echo -e "${YELLOW}[AVISO]${NC} $1"; }
-error()   { echo -e "${RED}[ERRO]${NC} $1"; exit 1; }
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+info() {
+  echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+success() {
+  echo -e "${GREEN}[OK]${NC} $1"
+}
+
+warn() {
+  echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+fail() {
+  echo -e "${RED}[ERROR]${NC} $1"
+  exit 1
+}
 
 echo ""
 echo "======================================================"
-echo "  Configuração Firebase — Estrutural"
+echo "  Firebase setup - Estrutural"
 echo "======================================================"
 echo ""
 
-# 1. Verificar .firebaserc
-FIREBASE_PROJECT=$(python3 -c "import json,sys; d=json.load(open('.firebaserc')); print(d['projects']['default'])" 2>/dev/null || echo "")
+FIREBASE_PROJECT=$(python3 -c "import json; print(json.load(open('.firebaserc'))['projects']['default'])" 2>/dev/null || echo "")
 if [[ -z "$FIREBASE_PROJECT" ]]; then
-  error "Configure o .firebaserc primeiro com o ID do seu projeto Firebase."
+  fail "Configure .firebaserc first with the Firebase project ID."
 fi
-info "Projeto Firebase: $FIREBASE_PROJECT"
+info "Firebase project: $FIREBASE_PROJECT"
 
-# 2. Verificar .env.local
-if [ ! -f .env.local ]; then
-  error "Arquivo .env.local não encontrado. Copie .env.example para .env.local e preencha os valores."
+if [[ ! -f .env.local ]]; then
+  fail "Missing .env.local. Copy .env.example to .env.local and fill the values first."
 fi
 
-STORAGE_BUCKET=$(grep "^NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=" .env.local | cut -d'=' -f2 | tr -d '"' | tr -d "'" | tr -d ' ')
+STORAGE_BUCKET=$(grep '^NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=' .env.local | cut -d'=' -f2 | tr -d '"' | tr -d "'" | tr -d ' ')
 
-# 3. Instalar firebase-tools se necessário
-if ! command -v firebase &> /dev/null; then
-  warn "firebase-tools não encontrado. Instalando..."
+if ! command -v firebase >/dev/null 2>&1; then
+  warn "firebase-tools not found. Installing globally..."
   npm install -g firebase-tools
 fi
 
-# 4. Verificar login no Firebase
-info "Verificando autenticação Firebase CLI..."
-if ! firebase projects:list --project "$FIREBASE_PROJECT" &>/dev/null 2>&1; then
-  warn "Não autenticado. Iniciando login..."
+info "Checking Firebase CLI authentication..."
+if ! firebase projects:list --project "$FIREBASE_PROJECT" >/dev/null 2>&1; then
+  warn "Not authenticated. Starting Firebase login..."
   firebase login
 fi
 
-# 5. Deploy das regras e índices do Firestore
-info "Publicando regras do Firestore..."
+info "Deploying Firestore rules..."
 firebase deploy --only firestore:rules --project "$FIREBASE_PROJECT"
-success "Regras do Firestore publicadas"
+success "Firestore rules deployed"
 
-info "Publicando regras do Storage..."
+info "Deploying Firestore indexes..."
+firebase deploy --only firestore:indexes --project "$FIREBASE_PROJECT"
+success "Firestore indexes deployed"
+
+info "Deploying Storage rules..."
 firebase deploy --only storage --project "$FIREBASE_PROJECT"
-success "Regras do Storage publicadas"
+success "Storage rules deployed"
 
-# 6. Configurar CORS do Storage (necessário para uploads funcionarem em produção)
 if [[ -n "$STORAGE_BUCKET" ]] && [[ "$STORAGE_BUCKET" != *"your-project"* ]]; then
-  if command -v gsutil &> /dev/null; then
-    info "Configurando CORS do Storage para $STORAGE_BUCKET..."
+  if command -v gsutil >/dev/null 2>&1; then
+    info "Applying Storage CORS to $STORAGE_BUCKET..."
     gsutil cors set storage.cors.json "gs://$STORAGE_BUCKET"
-    success "CORS do Storage configurado"
+    success "Storage CORS configured"
   else
     echo ""
-    warn "gsutil não encontrado — configure o CORS do Storage manualmente:"
-    warn "  1. Instale o Google Cloud SDK: https://cloud.google.com/sdk/docs/install"
-    warn "  2. Execute: gsutil cors set storage.cors.json gs://$STORAGE_BUCKET"
-    warn "  Sem o CORS, uploads de ícones não vão funcionar em produção."
+    warn "gsutil not found. Configure Storage CORS manually:"
+    warn "  1. Install Google Cloud SDK"
+    warn "  2. Run: gsutil cors set storage.cors.json gs://$STORAGE_BUCKET"
+    warn "  Icon uploads will fail in production until CORS is applied."
     echo ""
   fi
 else
-  warn "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET não configurado no .env.local — CORS do Storage não configurado."
-  warn "Configure manualmente: gsutil cors set storage.cors.json gs://SEU-BUCKET"
+  warn "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET is missing in .env.local. Storage CORS was not configured."
+  warn "Configure manually with: gsutil cors set storage.cors.json gs://YOUR_BUCKET"
 fi
 
 echo ""
 echo "======================================================"
-echo -e "  ${GREEN}Firebase configurado com sucesso!${NC}"
+echo -e "  ${GREEN}Firebase setup completed successfully${NC}"
 echo "======================================================"
 echo ""
-echo "  Próximos passos:"
-echo "  1. Garanta que os secrets VITE_FIREBASE_* e FIREBASE_SERVICE_ACCOUNT existem no GitHub"
-echo "  2. Faça push para main: git push origin main"
-echo "  3. Faça o deploy do Hosting: firebase deploy --only hosting --project $FIREBASE_PROJECT"
+echo "  Next steps:"
+echo "  1. Ensure GitHub secrets VITE_FIREBASE_* and FIREBASE_SERVICE_ACCOUNT exist"
+echo "  2. Push to main: git push origin main"
+echo "  3. Run the full deploy if needed: firebase deploy --only hosting,firestore:rules,firestore:indexes,storage --project $FIREBASE_PROJECT"
 echo ""

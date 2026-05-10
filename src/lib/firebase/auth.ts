@@ -8,7 +8,16 @@ import {
 import { getFirebaseAuth } from './config';
 
 const googleProvider = new GoogleAuthProvider();
-const ADMIN_EMAIL = (process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? 'fsalamoni@gmail.com').toLowerCase();
+
+function getConfiguredAdminEmail(): string | null {
+  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.trim().toLowerCase();
+
+  return adminEmail ? adminEmail : null;
+}
+
+export function getAdminConfigurationError(): string | null {
+  return getConfiguredAdminEmail() ? null : 'Admin nao configurado no ambiente atual. Campo ausente: NEXT_PUBLIC_ADMIN_EMAIL.';
+}
 
 export async function signInWithEmail(email: string, password: string): Promise<User> {
   const result = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
@@ -25,5 +34,7 @@ export async function signOut(): Promise<void> {
 }
 
 export function isAdmin(user: Pick<User, 'email'> | null): boolean {
-  return typeof user?.email === 'string' && user.email.toLowerCase() === ADMIN_EMAIL;
+  const adminEmail = getConfiguredAdminEmail();
+
+  return Boolean(adminEmail && typeof user?.email === 'string' && user.email.toLowerCase() === adminEmail);
 }

@@ -40,3 +40,6 @@ next-env.d.ts
 
 # firebase local artifacts
 .firebase/
+
+# generated operational evidence
+/artifacts/

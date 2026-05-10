@@ -23,6 +23,8 @@ Portal central publicado em **https://fsalomone.web.app** para listar e direcion
 - URL pública: `https://fsalomone.web.app`
 - Web App Firebase: `Plataformas Salomone`
 - Admin autorizado no front e nas rules: `fsalamoni@gmail.com`
+- Projeto staging: `hocapp-staging-44760`
+- URL staging: `https://hocapp-staging-44760.web.app`
 
 ## O que já está configurado no repositório
 
@@ -57,6 +59,21 @@ npm run build
 npx firebase-tools deploy --project hocapp-44760 --only hosting,firestore:rules,firestore:indexes,storage
 ```
 
+## Deploy manual de staging
+
+`npm run deploy:staging` carrega automaticamente `.env.staging.local` se ele existir; caso contrario usa [.env.staging.example](.env.staging.example).
+
+O deploy de staging publica Hosting e Firestore. Se o bucket padrao do projeto ainda nao existir, o script pula Storage automaticamente e informa esse estado.
+
+No estado atual, o projeto `hocapp-staging-44760` ja esta com Hosting e Firestore ativos em `https://hocapp-staging-44760.web.app`. O bucket padrao de Storage ainda nao existe porque a criacao falha sem billing vinculado ao projeto, e o Firebase Auth de staging ainda precisa ser provisionado antes da validacao completa do login admin.
+
+A home publica agora tem um catalogo de contingencia embutido no build. Se a leitura anonima do Firestore falhar, o portal continua servindo os cards publicados em vez de cair para erro total.
+
+```bash
+npm install
+npm run deploy:staging
+```
+
 ## Deploy automático no GitHub
 
 No repositório GitHub, mantenha estes secrets:
@@ -69,7 +86,13 @@ No repositório GitHub, mantenha estes secrets:
 - `VITE_FIREBASE_MESSAGING_SENDER_ID`
 - `VITE_FIREBASE_APP_ID`
 
+E mantenha também este secret no GitHub Actions:
+
+- `NEXT_PUBLIC_ADMIN_EMAIL`
+
 O workflow em [.github/workflows/deploy.yml](.github/workflows/deploy.yml) usa esses valores para buildar e publicar no site `fsalomone`.
+
+Depois do deploy, o workflow tambem executa um smoke check da homepage publica para garantir `200`, presenca de cards criticos e ausencia do estado de erro do catalogo.
 
 ## Authentication
 
@@ -78,6 +101,8 @@ Para o painel admin funcionar em produção, confirme no Firebase Console:
 1. `Authentication > Sign-in method`: Email/Password e Google habilitados.
 2. `Authentication > Settings > Authorized domains`: garantir `fsalomone.web.app` e `localhost`.
 3. O usuário `fsalamoni@gmail.com` precisa existir no Authentication.
+
+Para staging, o mesmo checklist precisa existir com `hocapp-staging-44760.web.app`, `hocapp-staging-44760.firebaseapp.com` e `localhost`. Hoje o projeto de staging ainda responde `CONFIGURATION_NOT_FOUND` na API administrativa do Auth, entao essa parte ainda nao esta provisionada.
 
 ## Como adicionar suas outras plataformas
 

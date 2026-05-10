@@ -9,10 +9,18 @@
     "dev": "next dev",
     "build": "next build",
     "build:next": "next build",
+    "build:staging": "node scripts/deploy-staging.mjs --build-only",
+    "smoke:homepage": "node scripts/smoke-public-homepage.mjs",
     "preview": "firebase emulators:start --only hosting",
-    "deploy": "npm run build && npx firebase-tools deploy --project hocapp-44760 --only hosting,firestore:rules,storage",
+    "baseline:capture": "node scripts/capture-baseline.mjs",
+    "backup:firestore": "node scripts/export-firestore-backup.mjs",
+    "audit:platform-data": "node scripts/audit-platform-data.mjs",
+    "deploy": "npm run deploy:prod",
+    "deploy:prod": "npm run build && npx firebase-tools deploy --project hocapp-44760 --only hosting,firestore:rules,firestore:indexes,storage",
+    "deploy:staging": "node scripts/deploy-staging.mjs",
     "start": "firebase emulators:start --only hosting",
     "lint": "eslint .",
+    "test": "vitest run",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -32,6 +40,7 @@
     "firebase-tools": "^14.22.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.5"
   }
 }

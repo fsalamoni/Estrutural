@@ -17,7 +17,13 @@
 
 ## Variaveis locais obrigatorias
 
-Use `.env.local` com os mesmos valores do app web do Firebase e mantenha `NEXT_PUBLIC_ADMIN_EMAIL` alinhado com o e-mail autorizado nas Rules.
+Use `.env.local` com os mesmos valores do app web do Firebase e mantenha `NEXT_PUBLIC_ADMIN_EMAIL` alinhado com o e-mail autorizado nas Rules e no secret do GitHub Actions.
+
+Para staging dedicado, use o projeto `hocapp-staging-44760`, o site `hocapp-staging-44760` e os valores de [.env.staging.example](.env.staging.example). O script `npm run deploy:staging` usa `.env.staging.local` se ele existir e, se o bucket padrao ainda nao existir, publica apenas Hosting e Firestore.
+
+Estado validado de staging: Hosting e Firestore estao ativos. Storage continua bloqueado por infraestrutura porque o bucket padrao nao pode ser criado sem billing no projeto. Auth ainda nao esta completamente provisionado; a API administrativa retorna `CONFIGURATION_NOT_FOUND`, entao Email/Password, Google e authorized domains ainda precisam ser inicializados no projeto de staging.
+
+O portal publico tem um catalogo de contingencia empacotado no build para manter a landing funcional mesmo quando a leitura publica do Firestore falha. Esse fallback precisa ser mantido alinhado com o catalogo oficial sempre que uma plataforma nova for adicionada e antes de um deploy de producao.
 
 ## Build local
 
@@ -35,6 +41,12 @@ npx firebase-tools deploy --project hocapp-44760 --only hosting,firestore:rules,
 ```
 
 ## Deploy automatico
+
+Depois do deploy em producao, rode o smoke check da homepage se precisar validar manualmente:
+
+```bash
+node scripts/smoke-public-homepage.mjs https://fsalomone.web.app/
+```
 
 O workflow em `.github/workflows/deploy.yml` faz:
 

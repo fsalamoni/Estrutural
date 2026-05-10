@@ -5,9 +5,14 @@ import { User, onAuthStateChanged } from 'firebase/auth';
 import {
   getFirebaseAuth,
   getFirebaseConfigurationError,
-  isFirebaseConfigured,
 } from '@/lib/firebase/config';
-import { isAdmin, signInWithEmail, signInWithGoogle, signOut } from '@/lib/firebase/auth';
+import {
+  getAdminConfigurationError,
+  isAdmin,
+  signInWithEmail,
+  signInWithGoogle,
+  signOut,
+} from '@/lib/firebase/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -21,13 +26,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+function getAuthConfigurationError(): string | null {
+  return getFirebaseConfigurationError() ?? getAdminConfigurationError();
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const configurationError = getAuthConfigurationError();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(isFirebaseConfigured);
-  const [configError, setConfigError] = useState<string | null>(getFirebaseConfigurationError());
+  const [loading, setLoading] = useState(() => configurationError == null);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isFirebaseConfigured) {
+    if (configurationError) {
       return;
     }
 
@@ -35,17 +45,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       getFirebaseAuth(),
       (u) => {
         setUser(u);
-        setConfigError(null);
+        setAuthError(null);
         setLoading(false);
       },
       () => {
-        setConfigError('Falha ao inicializar a autenticacao do Firebase.');
+        setAuthError('Falha ao inicializar a autenticacao do Firebase.');
         setLoading(false);
       }
     );
 
     return unsubscribe;
-  }, []);
+  }, [configurationError]);
+
+  const configError = configurationError ?? authError;
 
   return (
     <AuthContext.Provider
