@@ -36,7 +36,7 @@ npm run build
 4. Headers de cache e seguranca estao presentes na resposta do Hosting.
 5. A homepage publica responde `200`, nao exibe o estado de erro do catalogo e contem cards-chave como `Lexio` e `OmniDice`.
 
-Para staging, o item 2 fica temporariamente reduzido a Hosting + Firestore enquanto o bucket padrao de Storage nao existir. A validacao de login admin em staging tambem fica pendente enquanto o projeto continuar sem configuracao de Firebase Auth.
+Para staging, o item 2 volta a incluir Hosting + Firestore + Storage agora que o bucket padrao existe. A validacao de login admin em staging pode usar Email/Password e Google, que ja estao habilitados no projeto.
 
 ## Evidencias de encerramento
 

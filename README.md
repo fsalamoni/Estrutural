@@ -64,9 +64,9 @@ npx firebase-tools deploy --project hocapp-44760 --only hosting,firestore:rules,
 
 `npm run deploy:staging` carrega automaticamente `.env.staging.local` se ele existir; caso contrario usa [.env.staging.example](.env.staging.example).
 
-O deploy de staging publica Hosting e Firestore. Se o bucket padrao do projeto ainda nao existir, o script pula Storage automaticamente e informa esse estado.
+O deploy de staging publica Hosting, Firestore e Storage. Se o bucket padrao do projeto ainda nao existir, o script pula Storage automaticamente e informa esse estado.
 
-No estado atual, o projeto `hocapp-staging-44760` ja esta com Hosting e Firestore ativos em `https://hocapp-staging-44760.web.app`. O bucket padrao de Storage ainda nao existe porque a criacao falha sem billing vinculado ao projeto, e o Firebase Auth de staging ainda precisa ser provisionado antes da validacao completa do login admin.
+No estado atual, o projeto `hocapp-staging-44760` ja esta com Hosting, Firestore, Storage e Authentication provisionados em `https://hocapp-staging-44760.web.app`.
 
 A home publica agora tem um catalogo de contingencia embutido no build. Em operacao normal, a landing continua consumindo o Firestore publico; se essa leitura voltar a falhar, o portal continua servindo os cards publicados em vez de cair para erro total.
 
@@ -103,7 +103,7 @@ Para o painel admin funcionar em produção, confirme no Firebase Console:
 2. `Authentication > Settings > Authorized domains`: garantir `fsalomone.web.app` e `localhost`.
 3. O usuário `fsalamoni@gmail.com` precisa existir no Authentication.
 
-Para staging, o mesmo checklist precisa existir com `hocapp-staging-44760.web.app`, `hocapp-staging-44760.firebaseapp.com` e `localhost`. Hoje o projeto de staging ainda responde `CONFIGURATION_NOT_FOUND` na API administrativa do Auth, entao essa parte ainda nao esta provisionada.
+Para staging, o mesmo checklist existe com `hocapp-staging-44760.web.app`, `hocapp-staging-44760.firebaseapp.com` e `localhost`. Email/Password e Google ja estao habilitados no projeto de staging e o bucket padrao de Storage ja foi inicializado.
 
 ## Como adicionar suas outras plataformas
 

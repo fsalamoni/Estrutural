@@ -21,7 +21,7 @@ Use `.env.local` com os mesmos valores do app web do Firebase e mantenha `NEXT_P
 
 Para staging dedicado, use o projeto `hocapp-staging-44760`, o site `hocapp-staging-44760` e os valores de [.env.staging.example](.env.staging.example). O script `npm run deploy:staging` usa `.env.staging.local` se ele existir e, se o bucket padrao ainda nao existir, publica apenas Hosting e Firestore.
 
-Estado validado de staging: Hosting e Firestore estao ativos. Storage continua bloqueado por infraestrutura porque o bucket padrao nao pode ser criado sem billing no projeto. Auth ainda nao esta completamente provisionado; a API administrativa retorna `CONFIGURATION_NOT_FOUND`, entao Email/Password, Google e authorized domains ainda precisam ser inicializados no projeto de staging.
+Estado validado de staging: Hosting, Firestore, Storage e Authentication estao ativos. Billing esta vinculado ao projeto, o bucket `gs://hocapp-staging-44760.firebasestorage.app` existe com `storage.rules` publicadas e `storage.cors.json` aplicado, e Email/Password + Google estao habilitados no Authentication.
 
 O portal publico tem um catalogo de contingencia empacotado no build para manter a landing funcional mesmo quando a leitura publica do Firestore falha. Esse fallback precisa ser mantido alinhado com o catalogo oficial sempre que uma plataforma nova for adicionada e antes de um deploy de producao.
 
@@ -64,7 +64,7 @@ O workflow em `.github/workflows/deploy.yml` faz:
 O arquivo `storage.cors.json` precisa ser aplicado ao bucket real. Exemplo:
 
 ```bash
-gsutil cors set storage.cors.json gs://hocapp-44760.appspot.com
+gsutil cors set storage.cors.json gs://hocapp-44760.firebasestorage.app
 ```
 
 Sempre confirme se a origem publica ativa do portal esta listada.
