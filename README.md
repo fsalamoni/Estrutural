@@ -25,6 +25,7 @@ Portal central publicado em **https://fsalomone.web.app** para listar e direcion
 - Admin autorizado no front e nas rules: `fsalamoni@gmail.com`
 - Projeto staging: `hocapp-staging-44760`
 - URL staging: `https://hocapp-staging-44760.web.app`
+- Ultima validacao remota: workflow de deploy em `main` verde com smoke check da homepage aprovado
 
 ## O que já está configurado no repositório
 
@@ -67,7 +68,7 @@ O deploy de staging publica Hosting e Firestore. Se o bucket padrao do projeto a
 
 No estado atual, o projeto `hocapp-staging-44760` ja esta com Hosting e Firestore ativos em `https://hocapp-staging-44760.web.app`. O bucket padrao de Storage ainda nao existe porque a criacao falha sem billing vinculado ao projeto, e o Firebase Auth de staging ainda precisa ser provisionado antes da validacao completa do login admin.
 
-A home publica agora tem um catalogo de contingencia embutido no build. Se a leitura anonima do Firestore falhar, o portal continua servindo os cards publicados em vez de cair para erro total.
+A home publica agora tem um catalogo de contingencia embutido no build. Em operacao normal, a landing continua consumindo o Firestore publico; se essa leitura voltar a falhar, o portal continua servindo os cards publicados em vez de cair para erro total.
 
 ```bash
 npm install

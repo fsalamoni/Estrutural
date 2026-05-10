@@ -3,7 +3,7 @@
 ## Ambientes
 
 - Producao: projeto Firebase `hocapp-44760`, site Hosting `fsalomone`
-- Staging: deve existir como projeto separado antes de endurecimentos de regra e migracoes de dados
+- Staging: projeto Firebase `hocapp-staging-44760`, Hosting e Firestore ja provisionados em `https://hocapp-staging-44760.web.app`
 
 ## Segredos obrigatorios no GitHub
 
@@ -53,9 +53,11 @@ O workflow em `.github/workflows/deploy.yml` faz:
 1. `npm ci --legacy-peer-deps`
 2. `npm run type-check`
 3. `npm run lint`
-4. validacao de secrets
-5. `npm run build`
-6. deploy de hosting, rules, indexes e storage
+4. `npm test`
+5. validacao de secrets
+6. `npm run build`
+7. deploy de hosting, rules, indexes e storage
+8. smoke check da homepage publica
 
 ## CORS do Storage
 
